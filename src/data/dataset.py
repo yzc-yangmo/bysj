@@ -1,10 +1,7 @@
-import os, json
+import os
 from PIL import Image
-import torch
-from torchvision import transforms
-from torch.utils.data import Dataset, DataLoade
-
-from transform import FoodImageTransform
+from torch.utils.data import Dataset
+from data.transform import FoodImageTransform
 
 # 定义食物数据集
 class FoodImageDataset(Dataset):
@@ -23,10 +20,9 @@ class FoodImageDataset(Dataset):
         image_path = self.image_files[idx]
         # 获取图片的张量表示
         image = Image.open(image_path).convert('RGB')
-        image_tensor  = self.transform(image) # 调用transform的__call__方法
+        image_tensor = self.transform(image) # 调用transform的__call__方法
         
         # 根据路径获取标签
-        label = os.path.basename(image_path).split('_')[1]
+        label = os.path.basename(image_path).split('-')[1]  # 数据集图片命名格式 img-label-id.jpg
         
-            
         return image_tensor, label
