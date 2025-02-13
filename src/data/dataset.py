@@ -1,7 +1,11 @@
-import os
+import os, json
 from PIL import Image
+import torch
 from torch.utils.data import Dataset
 from data.transform import FoodImageTransform
+
+config = json.load(open('../config/config.json'))
+mapping = json.load(open('../config/mapping.json'))
 
 # 定义食物数据集
 class FoodImageDataset(Dataset):
@@ -22,7 +26,15 @@ class FoodImageDataset(Dataset):
         image = Image.open(image_path).convert('RGB')
         image_tensor = self.transform(image) # 调用transform的__call__方法
         
-        # 根据路径获取标签
-        label = os.path.basename(image_path).split('-')[1]  # 数据集图片命名格式 img-label-id.jpg
+        # 根据路径获取标签,数据集图片命名格式 img-label-id.jpg
+        filename = os.path.basename(image_path)
+        if len(filename.split("-")) != 3: 
+            raise ValueError('Invalid filename format')
         
-        return image_tensor, label
+        label = filename.split('-')[1]
+        
+        # 获取张量表示的标签
+        num_clsses = config["model"]["num_classes"]
+        label_tensor = torch.zeros(num_clsses)
+        label_tensor[mapping[label]] = 1
+        return image_tensor, label_tensor
