@@ -4,7 +4,7 @@ import torch.nn as nn
 from torchvision import models
 
 
-
+config = json.load(open('./config.json'))
 
 # FoodRecognitionModel: FRM
 class FRM_20250213_1(nn.Module):
@@ -13,7 +13,7 @@ class FRM_20250213_1(nn.Module):
     def __init__(self):
         super().__init__()
         
-        self.num_classes = json.load(open('../config/config.json'))["model"]["num_classes"] # 读取配置文件获取分类数
+        self.num_classes = config["model"]["num_classes"] # 读取配置文件获取分类数
         self.resnet50 = models.resnet50() # 使用未预训练的resnet50模型
         
         num_features = self.resnet50.fc.in_features

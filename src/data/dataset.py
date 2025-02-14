@@ -4,8 +4,8 @@ import torch
 from torch.utils.data import Dataset
 from data.transform import FoodImageTransform
 
-config = json.load(open('../config/config.json'))
-mapping = json.load(open('../config/mapping.json'))
+config = json.load(open('../config.json'))
+mapping = json.load(open('../mapping.json'))
 
 # 定义食物数据集
 class FoodImageDataset(Dataset):
