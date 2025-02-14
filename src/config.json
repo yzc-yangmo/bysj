@@ -9,7 +9,6 @@
     },
     "train": {
         "batch_size": 512,
-        "epochs": 100,
         "lr": 0.001,
         "num_epochs":10
     }

@@ -1,0 +1,1 @@
+2025-02-14 18:02:43 - config {'model': {'name': 'resnet50', 'num_classes': 101}, 'dataset': {'train_path': '../../train', 'val_path': '../../val'}, 'train': {'batch_size': 512, 'epochs': 100, 'lr': 0.001, 'num_epochs': 10}}
