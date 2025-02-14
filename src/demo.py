@@ -1,4 +1,5 @@
-import os, json, time
+import os, json, time, logging
+from datetime import datetime
 from PIL import Image
 import numpy as np
 import pandas as pd
@@ -13,6 +14,15 @@ from data.dataset import FoodImageDataset
 import custom_models
 
 
+# 配置日志
+logging.basicConfig(
+    filename=f'./log/training_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+
+# 读取配置文件
 config = json.load(open('./config.json'))
 mapping = json.load(open('./mapping.json'))
 print(config)
@@ -92,15 +102,29 @@ def train_model(model, train_loader, val_loader):
             best_val_acc = val_acc
             torch.save(model.state_dict(), 'best_model.pth')
         
-        # 打印训练信息
-        print(f'Epoch [{epoch+1}/{num_epochs}]')
-        print(f'Train Loss: {train_loss/len(train_loader):.4f}, Train Acc: {train_acc:.2f}%')
-        print(f'Val Loss: {val_loss/len(val_loader):.4f}, Val Acc: {val_acc:.2f}%')
-        
         epoch_time = time.time() - epoch_start
-        print(f'耗时: {epoch_time:.2f}s, 预计剩余时间: {epoch_time*(num_epochs-epoch-1)/60:.2f}min')
-        print('--------------------')
+        
+        train_info = f"""Epoch [{epoch+1}/{num_epochs}]
+                       Train Loss: {train_loss/len(train_loader):.4f}, Train Acc: {train_acc:.2f}%
+                       Val Loss: {val_loss/len(val_loader):.4f}, Val Acc: {val_acc:.2f}%
+                       耗时: {epoch_time:.2f} s, 预计剩余时间: {epoch_time*(num_epochs-epoch-1)/60:.2f} min
+                       --------------------"""
+        
+        # 打印训练信息
+        print(train_info)
+        logging.info(train_info)
+        
         
 if __name__ == '__main__':
     model = custom_models.FRM_20250213_1()
+    
+    for file_name in os.listdir("./"):
+        if file_name.endswith('.pth'):
+            # 加载当前目录下的pth文件
+            model.load_state_dict(torch.load(file_name))
+            print(f"loading {file_name}")
+            break
+        
+    # 记录配置信息
+    logging.info(f"config {config}")
     train_model(model, train_loader, val_loader)
