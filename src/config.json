@@ -1,15 +1,14 @@
 {
     "model": {
         "name": "resnet50",
-        "num_classes": 101,
-        "input_size": 224
+        "num_classes": 101
     },
     "dataset" : {
         "train_path" : "../../train",
         "val_path" : "../../val"
     },
     "train": {
-        "batch_size": 64,
+        "batch_size": 512,
         "epochs": 100,
         "lr": 0.001,
         "num_epochs":10
