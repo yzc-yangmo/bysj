@@ -1,4 +1,4 @@
-import os, json
+import os, json, time
 from PIL import Image
 import numpy as np
 import pandas as pd
@@ -13,9 +13,9 @@ from data.dataset import FoodImageDataset
 import custom_models
 
 
-config = json.load(open('../config/config.json'))
-mapping = json.load(open('../config/mapping.json'))
-
+config = json.load(open('./config.json'))
+mapping = json.load(open('./mapping.json'))
+print(config)
 
 train_foodimages = FoodImageDataset(config["dataset"]["train_path"])
 val_foodimages = FoodImageDataset(config["dataset"]["val_path"])
@@ -40,6 +40,7 @@ def train_model(model, train_loader, val_loader):
     best_val_acc = 0.0
     
     for epoch in range(num_epochs):
+        epoch_start = time.time()
         # 训练阶段
         model.train()
         train_loss = 0.0
@@ -81,7 +82,7 @@ def train_model(model, train_loader, val_loader):
                 val_loss += loss.item()
                 _, predicted = outputs.max(1)
                 val_total += labels.size(0)
-                val_correct += predicted.eq(labels).sum().item()
+                val_correct += predicted.eq(labels.max(1)[1]).sum().item()
         
         val_acc = 100. * val_correct / val_total
         
@@ -95,6 +96,9 @@ def train_model(model, train_loader, val_loader):
         print(f'Epoch [{epoch+1}/{num_epochs}]')
         print(f'Train Loss: {train_loss/len(train_loader):.4f}, Train Acc: {train_acc:.2f}%')
         print(f'Val Loss: {val_loss/len(val_loader):.4f}, Val Acc: {val_acc:.2f}%')
+        
+        epoch_time = time.time() - epoch_start
+        print(f'耗时: {epoch_time:.2f}s, 预计剩余时间: {epoch_time*(num_epochs-epoch-1)/60:.2f}min')
         print('--------------------')
         
 if __name__ == '__main__':
