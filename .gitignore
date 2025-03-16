@@ -1,4 +1,5 @@
 *.log
+*.jpg
 
 src/log/
 src/best_model.pth
