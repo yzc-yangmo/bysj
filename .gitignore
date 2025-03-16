@@ -1,1 +1,4 @@
-src/log
+*.log
+
+src/log/
+src/best_model.pth
