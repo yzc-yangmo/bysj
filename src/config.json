@@ -8,7 +8,7 @@
         "val_path" : "../../val"
     },
     "train": {
-        "batch_size": 512,
+        "batch_size": 32,
         "lr": 0.001,
         "num_epochs":10
     }
