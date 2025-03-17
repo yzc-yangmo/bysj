@@ -130,8 +130,8 @@ def train_model(model, train_loader, val_loader):
         wandb.log(wandb_log)
         
         train_info = f"""Epoch [{epoch+1}/{num_epochs}]
-                       Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.2f}%
-                       Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.2f}%
+                       Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}%
+                       Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}%
                        耗时: {epoch_time:.2f} s, 预计剩余时间: {epoch_time*(num_epochs-epoch-1)/60:.2f} min
                        --------------------"""
         
