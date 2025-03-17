@@ -1,15 +1,15 @@
 {
     "model": {
-        "name": "resnet50",
+        "name": "vit-demo",
         "num_classes": 101
     },
     "dataset" : {
-        "train_path" : "../../train",
-        "val_path" : "../../val"
+        "train_path" : "../dataset/train",
+        "val_path"   : "../dataset/val"
     },
     "train": {
-        "batch_size": 32,
-        "lr": 0.001,
+        "batch_size": 64,
+        "lr": 0.01,
         "num_epochs":10
     }
 }

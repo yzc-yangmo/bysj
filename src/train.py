@@ -1,8 +1,9 @@
-import os, json, time, logging
+import os, json, time
 from datetime import datetime
 from PIL import Image
 import numpy as np
 import pandas as pd
+import wandb
 import torch
 import torch.nn as nn
 from torch.optim import Adam
@@ -10,28 +11,28 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import models 
 from vit_model import VisionTransformer
 
-# ----
 from data.dataset import FoodImageDataset
 import custom_models
-
-
-# 配置日志
-logging.basicConfig(
-    filename=f'./log/training_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log',
-    level=logging.INFO,
-    format='%(asctime)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
 
 # 读取配置文件
 config = json.load(open('./config.json'))
 mapping = json.load(open('./mapping.json'))
 
+
+# 配置wandb
+wandb.init(project="food-image-classification（bysj）", 
+           name=f"vit-demo-{time.strftime('%Y%m%d-%H%M%S')}",
+           config=config)
+wandb_log = {}
+
 # 打印超参数
+print(f"----------------config----------------")
 for k, v in config.items():
     print(k)
     for kk, vv in v.items():
         print(f"--{kk}: {vv}")
+print(f"--------------------------------")
+
 
 # 读取数据集
 train_foodimages = FoodImageDataset(config["dataset"]["train_path"])
@@ -45,7 +46,7 @@ def train_model(model, train_loader, val_loader):
     lr = config["train"]["lr"]
     num_epochs = config["train"]["num_epochs"]
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f"using {device}")
+    print(f"using {device}!")
     
     # 移动模型到指定设备
     model = model.to(device)
@@ -56,6 +57,7 @@ def train_model(model, train_loader, val_loader):
     
     best_val_acc = 0.0
     
+    print(f"trian start!")
     for epoch in range(num_epochs):
         epoch_start = time.time()
         # 训练阶段
@@ -111,15 +113,31 @@ def train_model(model, train_loader, val_loader):
         
         epoch_time = time.time() - epoch_start
         
+        # 计算平均损失和准确率
+        train_loss = train_loss/len(train_loader)
+        train_acc = train_acc/len(train_loader)
+        val_loss = val_loss/len(val_loader)
+        val_acc = val_acc/len(val_loader)
+        
+        # 记录wandb信息
+        wandb_log = {
+            "train_loss": train_loss,
+            "train_acc": train_acc,
+            "val_loss": val_loss,
+            "val_acc": val_acc
+        }
+        # 记录训练信息到wandb
+        wandb.log(wandb_log)
+        
         train_info = f"""Epoch [{epoch+1}/{num_epochs}]
-                       Train Loss: {train_loss/len(train_loader):.4f}, Train Acc: {train_acc:.2f}%
-                       Val Loss: {val_loss/len(val_loader):.4f}, Val Acc: {val_acc:.2f}%
+                       Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.2f}%
+                       Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.2f}%
                        耗时: {epoch_time:.2f} s, 预计剩余时间: {epoch_time*(num_epochs-epoch-1)/60:.2f} min
                        --------------------"""
         
         # 打印训练信息
         print(train_info)
-        logging.info(train_info)
+
         
         
 if __name__ == '__main__':
@@ -132,6 +150,4 @@ if __name__ == '__main__':
     #         print(f"loading {file_name}")
     #         break
         
-    # 记录配置信息
-    logging.info(f"config {config}")
     train_model(model, train_loader, val_loader)
