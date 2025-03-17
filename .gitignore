@@ -1,5 +1,7 @@
 *.log
 *.jpg
+*.parquet
+*.zip
 
 src/log/
 src/best_model.pth
