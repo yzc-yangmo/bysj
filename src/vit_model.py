@@ -227,7 +227,7 @@ class VisionTransformer(nn.Module):
 if __name__ == "__main__":
     # 创建模型实例，101个分类
     model = VisionTransformer(
-        img_size=256, 
+        img_size=512, 
         patch_size=16,
         in_channels=3, 
         num_classes=101,
