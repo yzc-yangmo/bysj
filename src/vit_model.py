@@ -6,7 +6,7 @@ import torch.nn.functional as F
 class PatchEmbedding(nn.Module):
     """将图像分割成patch并进行线性嵌入"""
     
-    def __init__(self, img_size=512, patch_size=16, in_channels=3, embed_dim=768):
+    def __init__(self, img_size=256, patch_size=16, in_channels=3, embed_dim=768):
         super().__init__()
         self.img_size = img_size
         self.patch_size = patch_size
@@ -122,7 +122,7 @@ class VisionTransformer(nn.Module):
     Vision Transformer 模型
     
     Args:
-        img_size (int): 输入图像尺寸，默认为512
+        img_size (int): 输入图像尺寸，默认为256
         patch_size (int): patch大小，默认为16
         in_channels (int): 输入图像通道数，默认为3 (RGB)
         num_classes (int): 分类类别数，默认为101
@@ -134,7 +134,7 @@ class VisionTransformer(nn.Module):
         drop_rate (float): Dropout比率，默认为0.
         attn_drop_rate (float): 注意力Dropout比率，默认为0.
     """
-    def __init__(self, img_size=512, patch_size=32, in_channels=3, num_classes=101,
+    def __init__(self, img_size=256, patch_size=32, in_channels=3, num_classes=101,
                  embed_dim=768, depth=12, n_heads=12, mlp_ratio=4.,
                  qkv_bias=True, drop_rate=0., attn_drop_rate=0.):
         super().__init__()
@@ -227,7 +227,7 @@ class VisionTransformer(nn.Module):
 if __name__ == "__main__":
     # 创建模型实例，101个分类
     model = VisionTransformer(
-        img_size=512, 
+        img_size=256, 
         patch_size=16,
         in_channels=3, 
         num_classes=101,

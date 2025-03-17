@@ -11,13 +11,13 @@ class FoodImageTransform:
         
         if transform_type == 0:
             self.transform = transforms.Compose([
-                transforms.Resize((512, 512)),
+                transforms.Resize((256, 256)),
                 transforms.ToTensor()
             ])
         elif transform_type == 1:
             self.transform = transforms.Compose([
-                transforms.Resize(512),
-                transforms.CenterCrop((512, 512)),
+                transforms.Resize(256),
+                transforms.CenterCrop((256, 256)),
                 transforms.ToTensor()
             ])
         else:

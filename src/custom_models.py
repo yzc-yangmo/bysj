@@ -30,15 +30,15 @@ class FRM_20250213_1(nn.Module):
         
         
         self.resnet50.fc = nn.Sequential(  # 修改最后的全连接层以匹配类别数
-            nn.Linear(num_features, 512),
+            nn.Linear(num_features, 256),
             nn.ReLU(),
             nn.Dropout(0.5),
-            nn.Linear(512, self.num_classes)
+            nn.Linear(256, self.num_classes)
         )
         
     # define the forward pass
     def forward(self, x):
-        # 512x512x3 -> 256x256x3 -> 128x128x3  
+        # 256x256x3 -> 256x256x3 -> 128x128x3  
         x = self.conv(x)
         x = self.resnet50(x)
         return x
