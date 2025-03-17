@@ -27,7 +27,7 @@ logging.basicConfig(
 config = json.load(open('./config.json'))
 mapping = json.load(open('./mapping.json'))
 
-# 打印超参数
+# 打印配置文件/超参数
 for k, v in config.items():
     print(k)
     for kk, vv in v.items():
