@@ -26,8 +26,14 @@ logging.basicConfig(
 # 读取配置文件
 config = json.load(open('./config.json'))
 mapping = json.load(open('./mapping.json'))
-print(config)
 
+# 打印超参数
+for k, v in config.items():
+    print(k)
+    for kk, vv in v.items():
+        print(f"--{kk}: {vv}")
+
+# 读取数据集
 train_foodimages = FoodImageDataset(config["dataset"]["train_path"])
 val_foodimages = FoodImageDataset(config["dataset"]["val_path"])
 train_loader = DataLoader(train_foodimages, batch_size=config["train"]["batch_size"], shuffle=True)
