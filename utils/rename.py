@@ -108,31 +108,30 @@ temp = {
 mapping = {v: k for k, v in temp.items()}
 
 
-def work(file_names, thread_id):
+def work(rename_path, file_names, thread_id):
     try:
         for index, file in enumerate(file_names):
             if file.endswith(".jpg"):
-                if file.endswith(".jpg"):
-                    old = file
-                    info = file.split("-")
-                    if not info[1].isdigit():
+                old_file_name = file
+                info = file.split("-")
+                if not info[1].isdigit():
                         continue
-                    new = "-".join([info[0], mapping[int(info[1])], info[2]])
-                    os.rename(old, new)
-                    print(f"thread_id: {thread_id} {(index+1)/len(file_names)*100:.2f}%   {[index+1]} / {len(file_names)},  {old} -> {new}" )
+                new_file_name = "-".join([info[0], mapping[int(info[1])], info[2]])
+                os.rename(os.path.join(rename_path, old_file_name), os.path.join(rename_path, new_file_name))
+                print(f"thread_id: {thread_id} {(index+1)/len(file_names)*100:.2f}%   {[index+1]} / {len(file_names)},  {old_file_name} -> {new_file_name}" )
     except Exception as e:
         print(f"Error: {e}")
         return
 
 
-def main():
-    current_jpgs = [i for i in os.listdir(".\\") if i.endswith("jpg")]
+def main(rename_path):
+    current_jpgs = [i for i in os.listdir(rename_path) if i.endswith("jpg")]
     threads = []
-    thread_num = int(input("Enter the number of threads: "))
+    thread_num = 20
     step = len(current_jpgs) // thread_num
     
     for index, i in enumerate(range(0, len(current_jpgs), step)):
-        t = threading.Thread(target=work, args=(current_jpgs[i:i+step], index+1))
+        t = threading.Thread(target=work, args=(rename_path, current_jpgs[i:i+step], index+1))
         threads.append(t)
         t.start()
       
@@ -144,4 +143,5 @@ def main():
     
     
 if __name__ == '__main__':
-    main()
+    main(r"./dataset/train")
+    main(r"./dataset/val")
