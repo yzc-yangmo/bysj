@@ -110,15 +110,12 @@ def train_model(model, train_loader, val_loader):
         # 保存最佳模型
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save(model.state_dict(), 'best_model.pth')
+            torch.save(model.state_dict(), 'vit-demo-best_model.pth')
         
         epoch_time = time.time() - epoch_start
         
-        # 计算平均损失和准确率
-        train_loss = train_loss/len(train_loader)
-        train_acc = train_acc/len(train_loader)
-        val_loss = val_loss/len(val_loader)
-        val_acc = val_acc/len(val_loader)
+        # 计算平均损失
+        train_loss, val_loss = train_loss/len(train_loader), val_loss/len(val_loader)
         
         # 记录wandb信息
         # wandb_log = {
