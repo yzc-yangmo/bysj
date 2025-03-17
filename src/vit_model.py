@@ -221,20 +221,3 @@ class VisionTransformer(nn.Module):
         # 分类
         x = self.head(x)
         return x
-
-
-# 例子：如何创建和使用模型
-if __name__ == "__main__":
-    # 创建模型实例，101个分类
-    model = VisionTransformer(
-        img_size=512, 
-        patch_size=16,
-        in_channels=3, 
-        num_classes=101,
-        embed_dim=768, 
-        depth=12, 
-        n_heads=12
-    )
-    
-    # 打印模型结构
-    print(model)
