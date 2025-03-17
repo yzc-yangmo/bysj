@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 class FoodImageTransform:
 
     # 根据transform_code返回对应的transform
-    def __init__(self, transform_type=0):
+    def __init__(self, transform_type = 0):
         
         if transform_type == 0:
             self.transform = transforms.Compose([
