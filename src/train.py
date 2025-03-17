@@ -14,16 +14,17 @@ from vit_model import VisionTransformer
 from data.dataset import FoodImageDataset
 import custom_models
 
+
 # 读取配置文件
 config = json.load(open('./config.json'))
 mapping = json.load(open('./mapping.json'))
 
 
-# 配置wandb
-wandb.init(project="food-image-classification（bysj）", 
-           name=f"vit-demo-{time.strftime('%Y%m%d-%H%M%S')}",
-           config=config)
-wandb_log = {}
+# # 配置wandb
+# wandb.init(project="food-image-classification（bysj）", 
+#            name=f"vit-demo-{time.strftime('%Y%m%d-%H%M%S')}",
+#            config=config)
+# wandb_log = {}
 
 # 打印超参数
 print(f"----------------config----------------")
@@ -120,14 +121,14 @@ def train_model(model, train_loader, val_loader):
         val_acc = val_acc/len(val_loader)
         
         # 记录wandb信息
-        wandb_log = {
-            "train_loss": train_loss,
-            "train_acc": train_acc,
-            "val_loss": val_loss,
-            "val_acc": val_acc
-        }
-        # 记录训练信息到wandb
-        wandb.log(wandb_log)
+        # wandb_log = {
+        #     "train_loss": train_loss,
+        #     "train_acc": train_acc,
+        #     "val_loss": val_loss,
+        #     "val_acc": val_acc
+        # }
+        ## 记录训练信息到wandb
+        # wandb.log(wandb_log)
         
         train_info = f"""Epoch [{epoch+1}/{num_epochs}]
                        Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}%
