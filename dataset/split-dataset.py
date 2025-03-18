@@ -4,9 +4,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 splited_classes_num = 20
 
-target_classes = random.choices([k for k, _ in json.load(open('../src/mapping.json')).items()], k = splited_classes_num)
-
-print(" ".join(target_classes))
+target_classes = random.sample([k for k, _ in json.load(open('../src/mapping.json')).items()], k=splited_classes_num)
 
 train_dir = rf"sub-train-{splited_classes_num}"
 val_dir = rf"sub-val-{splited_classes_num}"
@@ -20,7 +18,7 @@ for i in os.listdir("./train"):
         shutil.copy(os.path.join("./train", i), 
                     os.path.join(train_dir, i))
         count += 1
-        print(f"train count: {count} {i}")
+print(f"train count: {count}")
 
 count = 0
 for i in os.listdir("./val"):
@@ -28,7 +26,8 @@ for i in os.listdir("./val"):
         shutil.copy(os.path.join("./val", i), 
                     os.path.join(val_dir, i))
         count += 1
-        print(f"val count: {count} {i}")
+print(f"val count: {count}")
 
 
+print("splited classes: \n" + " ".join(target_classes))
 
