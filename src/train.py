@@ -9,10 +9,10 @@ import torch.nn as nn
 from torch.optim import Adam
 from torch.utils.data import Dataset, DataLoader
 from torchvision import models 
-from vit_model import VisionTransformer
+
 
 from data.dataset import FoodImageDataset
-import custom_models
+from models import vit, resnet
 
 
 # 读取配置文件
@@ -22,7 +22,7 @@ mapping = json.load(open('./mapping.json'))
 
 # 配置wandb
 demo_id = time.strftime('%Y%m%d%H%M%S')
-wandb.init(project="food-image-classification（bysj）", 
+wandb.init(project="sub-food-image-classification（bysj）", 
            name=f"vit-demo-{demo_id}",
            config=config)
 wandb_log = {}
@@ -131,17 +131,23 @@ def train_model(model, train_loader, val_loader):
         wandb.log(wandb_log)
         
         # 打印训练信息
-        print(f"""demo_id: {demo_id}
-                time: {time.strftime('%Y-%m-%d %H:%M:%S')}
-                Epoch [{epoch+1}/{num_epochs}]
-                Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.2f}%
-                Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.2f}%
-                耗时: {epoch_time:.2f} s, 预计剩余时间: {epoch_time*(num_epochs-epoch-1)/60:.2f} min
-                --------------------""")
+        print(f"""{'='*50}
+        DEMO ID: {demo_id}
+        {'-'*50}
+        Time: {time.strftime('%Y-%m-%d %H:%M:%S')}
+        Epoch [{epoch+1}/{num_epochs}]
+        ┌───────────────────────┬───────────────┬───────────────┐
+        │                       │     Train     │      Val      │
+        ├───────────────────────┼───────────────┼───────────────┤
+        │ Value                │ {train_loss:.4f} │ {val_loss:.4f} │
+        │ Accuracy             │ {train_acc:.2f}% │ {val_acc:.2f}% │
+        └───────────────────────┴───────────────┴───────────────┘
+        Time Cost: {epoch_time:.2f}s | Remaining: {epoch_time*(num_epochs-epoch-1)/3600:.1f}h {epoch_time*(num_epochs-epoch-1)/60%60:.0f}m
+        {'='*50}""")
         
 if __name__ == '__main__':
-    model = VisionTransformer()
-    
+    model = vit.VisionTransformer()
+    print(model, "\n--------------------------------")
     # for file_name in os.listdir("./"):
     #     if file_name.endswith('.pth'):
     #         # 加载当前目录下的pth文件

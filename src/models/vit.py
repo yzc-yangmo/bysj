@@ -1,12 +1,15 @@
+import json
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+num_classes = json.load(open('./config.json'))["model"]["num_classes"]
+drop_rate = json.load(open('./config.json'))["model"]["drop_rate"]
 
 class PatchEmbedding(nn.Module):
     """将图像分割成patch并进行线性嵌入"""
     
-    def __init__(self, img_size=256, patch_size=16, in_channels=3, embed_dim=768):
+    def __init__(self, img_size=256, patch_size=16, in_channels=3, embed_dim=512):
         super().__init__()
         self.img_size = img_size
         self.patch_size = patch_size
@@ -37,7 +40,7 @@ class PatchEmbedding(nn.Module):
 class Attention(nn.Module):
     """多头自注意力机制"""
     
-    def __init__(self, dim, n_heads=12, qkv_bias=True, attn_drop=0., proj_drop=0.):
+    def __init__(self, dim, n_heads=12, qkv_bias=True, attn_drop=drop_rate, proj_drop=drop_rate):
         super().__init__()
         self.n_heads = n_heads
         self.dim = dim
@@ -73,7 +76,7 @@ class Attention(nn.Module):
 class MLP(nn.Module):
     """Feed Forward 网络"""
     
-    def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU, drop=0.):
+    def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.ReLU, drop=drop_rate):
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
@@ -95,7 +98,7 @@ class MLP(nn.Module):
 class TransformerBlock(nn.Module):
     """Transformer 编码器块"""
     
-    def __init__(self, dim, n_heads, mlp_ratio=4., qkv_bias=True, drop=0., attn_drop=0.,
+    def __init__(self, dim, n_heads, mlp_ratio=4., qkv_bias=True, drop=drop_rate, attn_drop=drop_rate,
                  norm_layer=nn.LayerNorm):
         super().__init__()
         self.norm1 = norm_layer(dim)
@@ -125,7 +128,7 @@ class VisionTransformer(nn.Module):
         img_size (int): 输入图像尺寸，默认为256
         patch_size (int): patch大小，默认为16
         in_channels (int): 输入图像通道数，默认为3 (RGB)
-        num_classes (int): 分类类别数，默认为101
+        num_classes (int): 分类类别数，通过读取配置文件获取
         embed_dim (int): 嵌入维度，默认为768
         depth (int): Transformer块数量，默认为12
         n_heads (int): 多头注意力中的头数，默认为12
@@ -134,9 +137,9 @@ class VisionTransformer(nn.Module):
         drop_rate (float): Dropout比率，默认为0.
         attn_drop_rate (float): 注意力Dropout比率，默认为0.
     """
-    def __init__(self, img_size=256, patch_size=32, in_channels=3, num_classes=101,
-                 embed_dim=768, depth=12, n_heads=12, mlp_ratio=4.,
-                 qkv_bias=True, drop_rate=0., attn_drop_rate=0.):
+    def __init__(self, img_size=256, patch_size=32, in_channels=3, num_classes=num_classes,
+                 embed_dim=512, depth=6, n_heads=8, mlp_ratio=4.,
+                 qkv_bias=True, drop_rate=drop_rate, attn_drop_rate=drop_rate):
         super().__init__()
         
         # Patch Embedding

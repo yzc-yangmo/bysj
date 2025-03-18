@@ -1,7 +1,8 @@
 {
     "model": {
-        "name": "vit-demo",
-        "num_classes": 20
+        "name": "resnet-demo",
+        "num_classes": 20,
+        "drop_rate": 0.3
     },
     "dataset" : {
         "train_path" : "../dataset/sub-train-20",
@@ -9,9 +10,9 @@
     },
     "train": {
         "batch_size": 128,
-        "lr": 3e-4,
-        "num_epochs":25,
-        "weight_decay": 1e-4,
-        "notes": "引入图形归一化"
+        "lr": 1e-4,
+        "num_epochs":30,
+        "weight_decay": 1e-5,
+        "notes": "resnet尝试"
     }   
 }

@@ -6,14 +6,17 @@ from torchvision import models
 
 config = json.load(open('./config.json'))
 
+num_classes = config["model"]["num_classes"]
+drop_rate = json.load(open('./config.json'))["model"]["drop_rate"]
+
 # FoodRecognitionModel: FRM
-class FRM_20250213_1(nn.Module):
+class resnet_v1(nn.Module):
     
     # define the neural network structure
     def __init__(self):
         super().__init__()
         
-        self.num_classes = config["model"]["num_classes"] # 读取配置文件获取分类数
+        self.num_classes = num_classes # 读取配置文件获取分类数
         self.resnet50 = models.resnet50() # 使用未预训练的resnet50模型
         
         num_features = self.resnet50.fc.in_features
@@ -32,7 +35,7 @@ class FRM_20250213_1(nn.Module):
         self.resnet50.fc = nn.Sequential(  # 修改最后的全连接层以匹配类别数
             nn.Linear(num_features, 256),
             nn.ReLU(),
-            nn.Dropout(0.5),
+            nn.Dropout(drop_rate),
             nn.Linear(256, self.num_classes)
         )
         
