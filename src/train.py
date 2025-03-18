@@ -130,16 +130,14 @@ def train_model(model, train_loader, val_loader):
         # 记录训练信息到wandb
         wandb.log(wandb_log)
         
-        train_info = f"""Epoch [{epoch+1}/{num_epochs}]
-                       Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.2f}%
-                       Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.2f}%
-                       耗时: {epoch_time:.2f} s, 预计剩余时间: {epoch_time*(num_epochs-epoch-1)/60:.2f} min
-                       --------------------"""
-        
         # 打印训练信息
-        print(train_info)
-
-        
+        print(f"""demo_id: {demo_id}
+                time: {time.strftime('%Y-%m-%d %H:%M:%S')}
+                Epoch [{epoch+1}/{num_epochs}]
+                Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.2f}%
+                Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.2f}%
+                耗时: {epoch_time:.2f} s, 预计剩余时间: {epoch_time*(num_epochs-epoch-1)/60:.2f} min
+                --------------------""")
         
 if __name__ == '__main__':
     model = VisionTransformer()
