@@ -118,14 +118,14 @@ def train_model(model, train_loader, val_loader):
         train_loss, val_loss = train_loss/len(train_loader), val_loss/len(val_loader)
         
         # 记录wandb信息
-        wandb_log = {
-            "train_loss": train_loss,
-            "train_acc": train_acc,
-            "val_loss": val_loss,
-            "val_acc": val_acc
-        }
-        # 记录训练信息到wandb
-        wandb.log(wandb_log)
+        # wandb_log = {
+        #     "train_loss": train_loss,
+        #     "train_acc": train_acc,
+        #     "val_loss": val_loss,
+        #     "val_acc": val_acc
+        # }
+        ## 记录训练信息到wandb
+        # wandb.log(wandb_log)
         
         train_info = f"""Epoch [{epoch+1}/{num_epochs}]
                        Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}%
