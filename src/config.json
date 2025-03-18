@@ -2,16 +2,16 @@
     "model": {
         "name": "vit-demo",
         "num_classes": 20,
-        "drop_rate": 0.3
+        "drop_rate": 0.4
     },
     "dataset" : {
         "train_path" : "../dataset/sub-train-20",
         "val_path"   : "../dataset/sub-val-20"
     },
     "train": {
-        "batch_size": 128,
+        "batch_size": 256,
         "lr": 1e-4,
-        "num_epochs":30,
+        "num_epochs":100,
         "weight_decay": 1e-5,
         "notes": "减少参数的vit"
     }   

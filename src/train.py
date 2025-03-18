@@ -15,10 +15,7 @@ config = json.load(open('./config.json'))
 mapping = json.load(open('./mapping.json'))
 
 # 检查配置文件是否正确
-if config["model"]["num_classes"] == 101 and config["dataset"]["train_path"] != "../dataset/train":
-    raise ValueError("配置文件错误，num_classes为 101 时，train_path必须为../dataset/train")
-
-if str(config["model"]["num_classes"]) not in config["dataset"]["train_path"]:
+if config["model"]["num_classes"] != 101 and str(config["model"]["num_classes"]) not in config["dataset"]["train_path"]:
     raise ValueError("配置文件错误，num_classes 与 train_path 不匹配")
 
 
