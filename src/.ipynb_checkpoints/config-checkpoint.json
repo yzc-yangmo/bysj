@@ -9,9 +9,7 @@
     },
     "train": {
         "batch_size": 256,
-        "lr": 3e-4,
-        "num_epochs":100,
-        "weight_decay": 1e-4,
-        "notes": "引入图形归一化"
-    }   
+        "lr": 0.0002,
+        "num_epochs":10
+    }
 }

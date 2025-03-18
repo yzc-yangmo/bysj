@@ -2,6 +2,7 @@
 *.jpg
 *.parquet
 *.zip
+*.pth
 
 src/log/
 src/best_model.pth

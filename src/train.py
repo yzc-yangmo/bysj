@@ -20,11 +20,12 @@ config = json.load(open('./config.json'))
 mapping = json.load(open('./mapping.json'))
 
 
-# # 配置wandb
-# wandb.init(project="food-image-classification（bysj）", 
-#            name=f"vit-demo-{time.strftime('%Y%m%d-%H%M%S')}",
-#            config=config)
-# wandb_log = {}
+# 配置wandb
+demo_id = time.strftime('%Y%m%d%H%M%S')
+wandb.init(project="food-image-classification（bysj）", 
+           name=f"vit-demo-{demo_id}",
+           config=config)
+wandb_log = {}
 
 # 打印超参数
 print(f"----------------config----------------")
@@ -45,6 +46,7 @@ val_loader = DataLoader(val_foodimages, batch_size=config["train"]["batch_size"]
 def train_model(model, train_loader, val_loader):
     # 根据配置文件定义超参数
     lr = config["train"]["lr"]
+    weight_decay = config["train"]["weight_decay"]
     num_epochs = config["train"]["num_epochs"]
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"using {device}!")
@@ -54,11 +56,11 @@ def train_model(model, train_loader, val_loader):
     
     # 定义损失函数和优化器
     criterion = nn.CrossEntropyLoss()
-    optimizer = Adam(model.parameters(), lr=lr)
+    optimizer = Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     
     best_val_acc = 0.0
     
-    print(f"trian start!")
+    print(f"trian start! demo_id: {demo_id}")
     for epoch in range(num_epochs):
         epoch_start = time.time()
         # 训练阶段
@@ -110,7 +112,7 @@ def train_model(model, train_loader, val_loader):
         # 保存最佳模型
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save(model.state_dict(), 'vit-demo-best_model.pth')
+            torch.save(model.state_dict(), f'vit-demo-{demo_id}-best_model.pth')
         
         epoch_time = time.time() - epoch_start
         
@@ -118,18 +120,19 @@ def train_model(model, train_loader, val_loader):
         train_loss, val_loss = train_loss/len(train_loader), val_loss/len(val_loader)
         
         # 记录wandb信息
-        # wandb_log = {
-        #     "train_loss": train_loss,
-        #     "train_acc": train_acc,
-        #     "val_loss": val_loss,
-        #     "val_acc": val_acc
-        # }
-        ## 记录训练信息到wandb
-        # wandb.log(wandb_log)
+        wandb_log = {
+            "train_loss": train_loss,
+            "train_acc": train_acc,
+            "val_loss": val_loss,
+            "val_acc": val_acc,
+            "lr": optimizer.param_groups[0]['lr']
+        }
+        # 记录训练信息到wandb
+        wandb.log(wandb_log)
         
         train_info = f"""Epoch [{epoch+1}/{num_epochs}]
-                       Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}%
-                       Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}%
+                       Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.2f}%
+                       Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.2f}%
                        耗时: {epoch_time:.2f} s, 预计剩余时间: {epoch_time*(num_epochs-epoch-1)/60:.2f} min
                        --------------------"""
         

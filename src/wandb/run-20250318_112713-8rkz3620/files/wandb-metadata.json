@@ -1,12 +1,12 @@
 {
   "os": "Linux-5.15.0-112-generic-x86_64-with-glibc2.35",
   "python": "CPython 3.12.3",
-  "startedAt": "2025-03-17T06:36:22.888648Z",
-  "program": "/root/bysj/src/train.py",
+  "startedAt": "2025-03-18T03:27:13.690804Z",
+  "program": "/root/bysj/src/./train.py",
   "codePath": "src/train.py",
   "git": {
     "remote": "https://githubfast.com/yzc-yangmo/bysj.git",
-    "commit": "9ed871518edb49f003463a7a0dc8a233ad345322"
+    "commit": "ad39b6f8c60fd7848cb541f2f8ff4c8e7c1dd116"
   },
   "email": "2403577910@qq.com",
   "root": "/root/bysj/src",
@@ -20,7 +20,7 @@
   "disk": {
     "/": {
       "total": "32212254720",
-      "used": "12366528512"
+      "used": "14419857408"
     }
   },
   "memory": {
