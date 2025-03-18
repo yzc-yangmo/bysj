@@ -16,6 +16,7 @@ class FoodImageDataset(Dataset):
         self.dataset_path = dataset_path
         self.transform = transform
         self.image_files = [os.path.join(dataset_path, f) for f in os.listdir(dataset_path) if f.endswith('.jpg')]
+        self.mapping = dict(zip(set(i.split("-")[1] for i in os.listdir(config["dataset"]["train_path"])), range(config["model"]["num_classes"])))
     
     # Implement __len__
     def __len__(self):
@@ -38,5 +39,5 @@ class FoodImageDataset(Dataset):
         # 获取张量表示的标签
         num_clsses = config["model"]["num_classes"]
         label_tensor = torch.zeros(num_clsses)
-        label_tensor[mapping[label]] = 1
+        label_tensor[self.mapping[label]] = 1
         return image_tensor, label_tensor
