@@ -16,7 +16,7 @@ class FoodImageDataset(Dataset):
         self.dataset_path = dataset_path
         self.transform = transform
         self.image_files = [os.path.join(dataset_path, f) for f in os.listdir(dataset_path) if f.endswith('.jpg')]
-        self.mapping = dict(zip(set(i.split("-")[1] for i in os.listdir(config["dataset"]["train_path"])), range(config["model"]["num_classes"])))
+        self.mapping = mapping if config["model"]["num_classes"] == 101 else dict(zip(set(i.split("-")[1] for i in os.listdir(config["dataset"]["train_path"])), range(config["model"]["num_classes"])))
     
     # Implement __len__
     def __len__(self):

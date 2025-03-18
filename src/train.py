@@ -1,14 +1,9 @@
 import os, json, time
-from datetime import datetime
-from PIL import Image
-import numpy as np
-import pandas as pd
 import wandb
 import torch
 import torch.nn as nn
 from torch.optim import Adam
-from torch.utils.data import Dataset, DataLoader
-from torchvision import models 
+from torch.utils.data import DataLoader 
 
 
 from data.dataset import FoodImageDataset
@@ -19,12 +14,26 @@ from models import vit, resnet
 config = json.load(open('./config.json'))
 mapping = json.load(open('./mapping.json'))
 
+# 检查配置文件是否正确
+if config["model"]["num_classes"] == 101 and config["dataset"]["train_path"] != "../dataset/train":
+    raise ValueError("配置文件错误，num_classes为 101 时，train_path必须为../dataset/train")
+
+if str(config["model"]["num_classes"]) not in config["dataset"]["train_path"]:
+    raise ValueError("配置文件错误，num_classes 与 train_path 不匹配")
+
 
 # 配置wandb
+'''
+project: 项目名称
+name & demo_name: 实验名称，格式：模型-batch_size-learning_rate-drop_rate
+config: 参数配置
+'''
+
 demo_id = time.strftime('%Y%m%d%H%M%S')
-wandb.init(project="sub-food-image-classification（bysj）", 
-           name=f"vit-demo-{demo_id}",
-           config=config)
+demo_name = f"{config['model']['name']}-{config['train']['batch_size']}-{config['train']['lr']}-{config['model']['drop_rate']}"
+wandb.init(project = f"sub-food-image-classification（num_classes = {config['model']['num_classes']}）", 
+           name = demo_name,
+           config = config)
 wandb_log = {}
 
 # 打印超参数
@@ -33,8 +42,6 @@ for k, v in config.items():
     print(k)
     for kk, vv in v.items():
         print(f"--{kk}: {vv}")
-print(f"--------------------------------")
-
 
 # 读取数据集
 train_foodimages = FoodImageDataset(config["dataset"]["train_path"])
@@ -60,7 +67,7 @@ def train_model(model, train_loader, val_loader):
     
     best_val_acc = 0.0
     
-    print(f"trian start! demo_id: {demo_id}")
+    print(f"trian start! \nDemo_Id: {demo_id} \nDemo_Name: {demo_name}")
     for epoch in range(num_epochs):
         epoch_start = time.time()
         # 训练阶段
@@ -112,7 +119,7 @@ def train_model(model, train_loader, val_loader):
         # 保存最佳模型
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save(model.state_dict(), f'vit-demo-{demo_id}-best_model.pth')
+            torch.save(model.state_dict(), f'./pth/{demo_name}-{demo_id}-best_model.pth')
         
         epoch_time = time.time() - epoch_start
         
@@ -131,23 +138,12 @@ def train_model(model, train_loader, val_loader):
         wandb.log(wandb_log)
         
         # 打印训练信息
-        print(f"""{'='*50}
-        DEMO ID: {demo_id}
-        {'-'*50}
-        Time: {time.strftime('%Y-%m-%d %H:%M:%S')}
-        Epoch [{epoch+1}/{num_epochs}]
-        ┌───────────────────────┬───────────────┬───────────────┐
-        │                       │     Train     │      Val      │
-        ├───────────────────────┼───────────────┼───────────────┤
-        │ Value                │ {train_loss:.4f} │ {val_loss:.4f} │
-        │ Accuracy             │ {train_acc:.2f}% │ {val_acc:.2f}% │
-        └───────────────────────┴───────────────┴───────────────┘
-        Time Cost: {epoch_time:.2f}s | Remaining: {epoch_time*(num_epochs-epoch-1)/3600:.1f}h {epoch_time*(num_epochs-epoch-1)/60%60:.0f}m
-        {'='*50}""")
+        print(f"{'='*50}\nTime: {time.strftime('%Y-%m-%d %H:%M:%S')}\nDemo Name: {demo_name}\n{'-'*50}\nEpoch [{epoch+1}/{num_epochs}]\nTrain Loss: {train_loss:.4f}      Val Loss: {val_loss:.4f}\nTrain Accuracy: {train_acc:.2f}%   Val Accuracy: {val_acc:.2f}%\nEpoch Time: {epoch_time:.2f} s \n")
+
         
 if __name__ == '__main__':
     model = vit.VisionTransformer()
-    print(model, "\n--------------------------------")
+    print("-----------------model----------------\n", model, "\n--------------------------------")
     # for file_name in os.listdir("./"):
     #     if file_name.endswith('.pth'):
     #         # 加载当前目录下的pth文件
