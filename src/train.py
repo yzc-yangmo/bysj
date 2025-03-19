@@ -141,7 +141,7 @@ def train_model(model, train_loader, val_loader):
         
 if __name__ == '__main__':
     model = VisionTransformer()
-    
+    print(model)
     # for file_name in os.listdir("./"):
     #     if file_name.endswith('.pth'):
     #         # 加载当前目录下的pth文件
