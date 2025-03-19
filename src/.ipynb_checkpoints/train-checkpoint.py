@@ -28,10 +28,10 @@ config: 参数配置
 
 demo_id = time.strftime('%Y%m%d%H%M%S')
 demo_name = f"{config['model']['name']}_{config['train']['batch_size']}_{config['train']['lr']}_{config['model']['drop_rate']}"
-# wandb.init(project = f"sub-food-image-classification（num_classes = {config['model']['num_classes']}）", 
-#            name = demo_name,
-#            config = config)
-# wandb_log = {}
+wandb.init(project = f"sub-food-image-classification（num_classes = {config['model']['num_classes']}）", 
+           name = demo_name,
+           config = config)
+wandb_log = {}
 
 # 打印超参数
 print(f"----------------config----------------")
@@ -124,16 +124,16 @@ def train_model(model, train_loader, val_loader):
         train_loss, val_loss = train_loss/len(train_loader), val_loss/len(val_loader)
         
         # 记录wandb信息
-        # wandb_log = {
-        #     "train_loss": train_loss,
-        #     "train_acc": train_acc,
-        #     "val_loss": val_loss,
-        #     "val_acc": val_acc,
-        #     "lr": optimizer.param_groups[0]['lr'],
-        #     "epoch_time" : epoch_time
-        # }
-        # # 记录训练信息到wandb
-        # wandb.log(wandb_log)
+        wandb_log = {
+            "train_loss": train_loss,
+            "train_acc": train_acc,
+            "val_loss": val_loss,
+            "val_acc": val_acc,
+            "lr": optimizer.param_groups[0]['lr'],
+            "epoch_time" : epoch_time
+        }
+        # 记录训练信息到wandb
+        wandb.log(wandb_log)
         
         # 打印训练信息
         print(f"{'='*50}\nTime: {time.strftime('%Y-%m-%d %H:%M:%S')}\nDemo Name: {demo_name}\n{'-'*50}\nEpoch [{epoch+1}/{num_epochs}]\nTrain Loss: {train_loss:.4f}      Val Loss: {val_loss:.4f}\nTrain Accuracy: {train_acc:.2f}%   Val Accuracy: {val_acc:.2f}%\nEpoch Time: {epoch_time:.2f} s \n")
