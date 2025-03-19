@@ -1,6 +1,6 @@
 {
     "model": {
-        "name": "resnet50",
+        "name": "resnet",
         "num_classes": 20,
         "drop_rate": 0.3
     },
@@ -13,6 +13,6 @@
         "lr": 1e-4,
         "num_epochs":50,
         "weight_decay": 1e-5,
-        "notes": "使用预训练的resnet50"
+        "notes": "使用resnet50"
     }   
 }
