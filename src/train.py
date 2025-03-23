@@ -28,9 +28,9 @@ for k, v in config.items():
     for kk, vv in v.items():
         print(f"--{kk}: {vv}")
 
-# 读取数据集
-train_foodimages = FoodImageDataset(config["dataset"]["train_path"])
-val_foodimages = FoodImageDataset(config["dataset"]["val_path"])
+# 读取数据集，训练集使用数据增强
+train_foodimages = FoodImageDataset(config["dataset"]["train_path"], transform_type=1)  # 使用数据增强
+val_foodimages = FoodImageDataset(config["dataset"]["val_path"], transform_type = 0)  # 验证集使用简单变换
 train_loader = DataLoader(train_foodimages, batch_size=config["train"]["batch_size"], shuffle=True)
 val_loader = DataLoader(val_foodimages, batch_size=config["train"]["batch_size"], shuffle=True)
 
