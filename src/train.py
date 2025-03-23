@@ -5,9 +5,8 @@ import torch.nn as nn
 from torch.optim import AdamW
 from torch.utils.data import DataLoader 
 
-
 from data.dataset import FoodImageDataset
-from models import vit, resnet
+from model import Model
 
 
 # 读取配置文件
@@ -156,21 +155,9 @@ def train_model(model, train_loader, val_loader):
         # 打印训练信息
         print(f"{'='*50}\nTime: {time.strftime('%Y-%m-%d %H:%M:%S')}\nDemo Name: {demo_name}\n{'-'*50}\nEpoch [{epoch+1}/{num_epochs}]\nTrain Loss: {train_loss:.4f}      Val Loss: {val_loss:.4f}\nTrain Accuracy: {train_acc:.2f}%   Val Accuracy: {val_acc:.2f}%\nEpoch Time: {epoch_time:.2f} s \n")
 
-def get_model():
-    model_name = config["model"]["name"]
-    
-    if model_name == "resnet":
-        return resnet.resnet_v1()
-    
-    elif model_name == "vit":
-        return vit.VisionTransformer()
-    
-    else:
-        raise ValueError(f"不支持的模型: {model_name}")
-
 
 if __name__ == '__main__':
-    model = get_model()
+    model = Model(config["model"]["name"], config["model"]["num_classes"], config["model"]["drop_rate"])
     use_wandb = config["train"]["use_wandb"]
     print("-----------------model----------------\n", model, "\n--------------------------------")
     # for file_name in os.listdir("./"):
