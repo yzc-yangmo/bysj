@@ -1,6 +1,6 @@
 {
     "model": {
-        "name": "resnet",
+        "name": "vit",
         "num_classes": 20,
         "drop_rate": 0.3
     },
@@ -13,6 +13,8 @@
         "lr": 1e-4,
         "num_epochs":50,
         "weight_decay": 1e-5,
-        "notes": "使用resnet50"
+        "use_wandb": true,
+        "transform_type": 2,
+        "notes": "vit，引入数据增强"
     }   
 }

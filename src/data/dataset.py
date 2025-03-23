@@ -12,9 +12,9 @@ mapping = json.load(open('./mapping.json'))
 # 定义食物数据集
 class FoodImageDataset(Dataset):
     
-    def __init__(self, dataset_path, transform=FoodImageTransform(1)): # 默认使用transform方案1
+    def __init__(self, dataset_path, transform_type=1):
         self.dataset_path = dataset_path
-        self.transform = transform
+        self.transform = FoodImageTransform(transform_type)
         self.image_files = [os.path.join(dataset_path, f) for f in os.listdir(dataset_path) if f.endswith('.jpg')]
         self.mapping = mapping if config["model"]["num_classes"] == 101 else dict(zip(set(i.split("-")[1] for i in os.listdir(config["dataset"]["train_path"])), range(config["model"]["num_classes"])))
     
