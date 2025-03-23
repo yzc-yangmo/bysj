@@ -2,7 +2,7 @@ import os, json, time
 import wandb
 import torch
 import torch.nn as nn
-from torch.optim import Adam
+from torch.optim import AdamW
 from torch.utils.data import DataLoader 
 
 
@@ -18,20 +18,8 @@ mapping = json.load(open('./mapping.json'))
 if config["model"]["num_classes"] != 101 and str(config["model"]["num_classes"]) not in config["dataset"]["train_path"]:
     raise ValueError("配置文件错误，num_classes 与 train_path 不匹配")
 
-
-# 配置wandb
-'''
-project: 项目名称
-name & demo_name: 实验名称，格式：模型-batch_size-learning_rate-drop_rate
-config: 参数配置
-'''
-
 demo_id = time.strftime('%Y%m%d%H%M%S')
 demo_name = f"{config['model']['name']}_{config['train']['batch_size']}_{config['train']['lr']}_{config['model']['drop_rate']}"
-wandb.init(project = f"sub-food-image-classification（num_classes = {config['model']['num_classes']}）", 
-           name = demo_name,
-           config = config)
-wandb_log = {}
 
 # 打印超参数
 print(f"----------------config----------------")
@@ -48,6 +36,14 @@ val_loader = DataLoader(val_foodimages, batch_size=config["train"]["batch_size"]
 
 # 训练函数
 def train_model(model, train_loader, val_loader):
+    # 配置wandb
+
+    if use_wandb:
+        wandb.init(project = f"sub-food-image-classification（num_classes = {config['model']['num_classes']}）", 
+                name = demo_name,
+                config = config)
+        wandb_log = {}
+    
     # 根据配置文件定义超参数
     lr = config["train"]["lr"]
     weight_decay = config["train"]["weight_decay"]
@@ -60,7 +56,7 @@ def train_model(model, train_loader, val_loader):
     
     # 定义损失函数和优化器
     criterion = nn.CrossEntropyLoss()
-    optimizer = Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+    optimizer = AdamW(model.parameters(), lr=lr, weight_decay=weight_decay, betas=(0.9, 0.999))
     
     best_val_acc = 0.0
     
@@ -123,24 +119,39 @@ def train_model(model, train_loader, val_loader):
         # 计算平均损失
         train_loss, val_loss = train_loss/len(train_loader), val_loss/len(val_loader)
         
+        
         # 记录wandb信息
-        wandb_log = {
-            "train_loss": train_loss,
-            "train_acc": train_acc,
-            "val_loss": val_loss,
-            "val_acc": val_acc,
-            "lr": optimizer.param_groups[0]['lr'],
-            "epoch_time" : epoch_time
-        }
-        # 记录训练信息到wandb
-        wandb.log(wandb_log)
+        if use_wandb:
+            wandb_log = {
+                "train_loss": train_loss,
+                "train_acc": train_acc,
+                "val_loss": val_loss,
+                "val_acc": val_acc,
+                "lr": optimizer.param_groups[0]['lr'],
+                "epoch_time" : epoch_time
+            }
+            # 记录训练信息到wandb
+            wandb.log(wandb_log)
         
         # 打印训练信息
         print(f"{'='*50}\nTime: {time.strftime('%Y-%m-%d %H:%M:%S')}\nDemo Name: {demo_name}\n{'-'*50}\nEpoch [{epoch+1}/{num_epochs}]\nTrain Loss: {train_loss:.4f}      Val Loss: {val_loss:.4f}\nTrain Accuracy: {train_acc:.2f}%   Val Accuracy: {val_acc:.2f}%\nEpoch Time: {epoch_time:.2f} s \n")
 
-        
+def get_model():
+    model_name = config["model"]["name"]
+    
+    if model_name == "resnet":
+        return resnet.resnet_v1()
+    
+    elif model_name == "vit":
+        return vit.VisionTransformer()
+    
+    else:
+        raise ValueError(f"不支持的模型: {model_name}")
+
+
 if __name__ == '__main__':
-    model = resnet.resnet_v1()
+    model = get_model()
+    use_wandb = True
     print("-----------------model----------------\n", model, "\n--------------------------------")
     # for file_name in os.listdir("./"):
     #     if file_name.endswith('.pth'):

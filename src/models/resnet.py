@@ -9,7 +9,7 @@ num_classes = config["model"]["num_classes"]
 drop_rate = config["model"]["drop_rate"]
 
 class resnet_v1(nn.Module):
-    def __init__(self, num_classes=num_classes, pretrained=True, drop_rate=drop_rate):
+    def __init__(self, num_classes=num_classes, pretrained=False, drop_rate=drop_rate):
         super(resnet_v1, self).__init__()
         
         # 加载预训练的ResNet-50
