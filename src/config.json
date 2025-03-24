@@ -9,10 +9,17 @@
         "val_path"   : "../dataset/sub-val-20"
     },
     "train": {
+<<<<<<< HEAD
         "batch_size": 256,
         "lr": 3e-4,
         "num_epochs":300,
         "weight_decay": 3e-4,
+=======
+        "batch_size": 128,
+        "lr": 5e-4,
+        "num_epochs":50,
+        "weight_decay": 5e-4,
+>>>>>>> e9aac6a592635dc03ca3668dba1b648a101bf700
         "use_wandb": true,
         "transform_type": 2,
         "notes": "vit，引入数据增强"

@@ -3,13 +3,9 @@ import torch.nn as nn
 from torchvision import models
 
 # 加载配置文件
-config = json.load(open('./config.json'))
-
-num_classes = config["model"]["num_classes"]
-drop_rate = config["model"]["drop_rate"]
 
 class resnet_v1(nn.Module):
-    def __init__(self, num_classes=num_classes, pretrained=False, drop_rate=drop_rate):
+    def __init__(self, num_classes, drop_rate, pretrained=False):
         super(resnet_v1, self).__init__()
         
         # 加载预训练的ResNet-50
