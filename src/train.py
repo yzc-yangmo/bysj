@@ -147,7 +147,6 @@ def train_model(model, train_loader, val_loader):
                 "train_acc": train_acc,
                 "val_loss": val_loss,
                 "val_acc": val_acc,
-                "lr": optimizer.param_groups[0]['lr'],
                 "epoch_time" : epoch_time
             }
             # 记录训练信息到wandb
