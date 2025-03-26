@@ -132,6 +132,8 @@ def train_model(model, train_loader, val_loader):
         # 保存最佳模型
         if val_acc > best_val_acc:
             best_val_acc = val_acc
+            if not os.path.exists('./pth'):
+                os.makedirs('./pth')
             torch.save(model.state_dict(), f'./pth/{demo_name}-{demo_id}-best_model.pth')
         
         epoch_time = time.time() - epoch_start
