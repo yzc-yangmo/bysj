@@ -129,16 +129,16 @@ class VisionTransformer(nn.Module):
         patch_size (int): patch大小，默认为16
         in_channels (int): 输入图像通道数，默认为3 (RGB)
         num_classes (int): 分类类别数，通过读取配置文件获取
-        embed_dim (int): 嵌入维度，默认为768
-        depth (int): Transformer块数量，默认为12
-        n_heads (int): 多头注意力中的头数，默认为12
-        mlp_ratio (float): MLP中隐藏层维度与嵌入维度的比率，默认为4.0
+        embed_dim (int): 嵌入维度
+        depth (int): Transformer块数量
+        n_heads (int): 多头注意力中的头数
+        mlp_ratio (float): MLP中隐藏层维度与嵌入维度的比率
         qkv_bias (bool): 是否在QKV投影中使用偏置，默认为True
-        drop_rate (float): Dropout比率，默认为0.
-        attn_drop_rate (float): 注意力Dropout比率，默认为0.
+        drop_rate (float): Dropout比率，
+        attn_drop_rate (float): 注意力Dropout比率，
     """
     def __init__(self, img_size=256, patch_size=32, in_channels=3, num_classes=num_classes,
-                 embed_dim=512, depth=6, n_heads=8, mlp_ratio=4.,
+                 embed_dim=384, depth=4, n_heads=6, mlp_ratio=2.,
                  qkv_bias=True, drop_rate=drop_rate, attn_drop_rate=drop_rate):
         super().__init__()
         
@@ -185,6 +185,9 @@ class VisionTransformer(nn.Module):
         
         # 初始化所有线性层和层归一化
         self.apply(self._init_weights_layers)
+        
+        
+        
     
     def _init_weights_layers(self, m):
         if isinstance(m, nn.Linear):
