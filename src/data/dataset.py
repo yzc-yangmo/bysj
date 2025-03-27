@@ -40,4 +40,5 @@ class FoodImageDataset(Dataset):
         num_clsses = config["model"]["num_classes"]
         label_tensor = torch.zeros(num_clsses)
         label_tensor[self.mapping[label]] = 1
+        
         return image_tensor, label_tensor

@@ -1,7 +1,9 @@
-import json
+import os, json
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 num_classes = json.load(open('./config.json'))["model"]["num_classes"]
 drop_rate = json.load(open('./config.json'))["model"]["drop_rate"]

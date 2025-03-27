@@ -1,6 +1,8 @@
-import json
+import os, json
 import torch.nn as nn
 from torchvision import models
+
+os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # 加载配置文件
 

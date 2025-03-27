@@ -1,19 +1,49 @@
-import sys
+import os, sys
+import torch
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                             QHBoxLayout, QPushButton, QLabel, QFileDialog, 
                             QScrollArea, QGridLayout, QGroupBox, QStatusBar)
-from PyQt5.QtGui import QPixmap, QImage, QFont
+from PyQt5.QtGui import QPixmap, QImage, QFont, QIcon
 from PyQt5.QtCore import Qt, QSize
+from InferenceEngine import InferenceEngine
+from models import vit, resnet
+
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 
 class FoodRecognitionSystem(QMainWindow):
     def __init__(self):
         super().__init__()
         self.initUI()
+        self.load_model()
+        self.first_upload = True # 第一次上传完成后，将first_upload设置为False，再次上传时无需点击即可进行识别
+
+    # 创建推理实例
+    def load_model(self):
+        try:
+            
+            model_path = "vit_128_0.0002_0.3_DA-2-20250327111245-best_model.pth"
+            self.InferenceEngine_engine = InferenceEngine(model_path)
+            print("model load success, model path: ", model_path)
         
+        except Exception as e:
+            self.statusBar.showMessage(f'发生错误: {str(e)}')
+            self.result_label.setText(f"发生错误: {str(e)}")
+    
     def initUI(self):
+        
         # 设置窗口标题和大小
-        self.setWindowTitle('食物识别系统')
+        device_info = "CPU"
+        if torch.cuda.is_available():
+            num_gpus = torch.cuda.device_count()
+            gpu_names = []
+            for i in range(num_gpus):
+                gpu_name = torch.cuda.get_device_name(i)
+                gpu_names.append(f"GPU {i}: {gpu_name}")
+            device_info = " | ".join(gpu_names)
+        self.setWindowTitle(f'食物识别系统 ({device_info})')
         self.setGeometry(100, 100, 1000, 800)
+        self.setWindowIcon(QIcon('./food101.ico')) 
         
         # 创建中央部件
         central_widget = QWidget()
@@ -103,32 +133,51 @@ class FoodRecognitionSystem(QMainWindow):
                 self.image_display.setPixmap(pixmap)
                 self.statusBar.showMessage(f'已加载图片: {file_path}')
                 self.current_image_path = file_path
+                
+                if not self.first_upload:
+                    self.recognize_food()
+                
             else:
                 self.statusBar.showMessage('无法加载图片')
     
     def recognize_food(self):
         """识别食物功能"""
         if hasattr(self, 'current_image_path'):
-            # 这里应该调用实际的食物识别模型
-            # 以下是模拟的识别结果
             self.statusBar.showMessage('正在识别...')
             
-            # 模拟识别结果 - 实际应用中应替换为真实的识别逻辑
-            result_text = """
-            <h3>识别结果:</h3>
-            <p><b>食物名称:</b> 披萨</p>
-            <p><b>置信度:</b> 95.7%</p>
-            <p><b>营养成分:</b></p>
-            <ul>
-                <li>热量: 266千卡/100克</li>
-                <li>蛋白质: 11克/100克</li>
-                <li>脂肪: 10克/100克</li>
-                <li>碳水化合物: 33克/100克</li>
-            </ul>
-            """
+            try:
+                # 进行推理
+                infer_info = self.InferenceEngine_engine.inference(self.current_image_path)
+                
+                if infer_info["success"]:
+                    # 构建结果显示
+                    result_text = f"""
+                    <p><b>食物名称:</b> {infer_info["food_info"]["chn"]}</p>
+                    <p><b>置信度:</b> {infer_info["confidence"]:.1f}%</p>
+                    <p><b>耗时:</b> {infer_info["inference_time"]:.2f} 秒</p>
+                    <p><br></p>
+                    <p><b>营养成分:</b></p>
+                    <p><b>热量:</b> {infer_info["food_info"]["calories"]} kcal</p>
+                    <p><b>蛋白质:</b> {infer_info["food_info"]["protein"]} g</p>
+                    <p><b>脂肪:</b> {infer_info["food_info"]["fat"]} g</p>
+                    <p><b>碳水化合物:</b> {infer_info["food_info"]["carb"]} g </p>
+                    <p><b>以上数据为100g食物的营养成分</b></p>
+                    """
+                    
+                    self.result_label.setText(result_text)
+                    self.statusBar.showMessage('识别完成')
+                    
+                    # 第一次上传完成后，将first_upload设置为False
+                    if self.first_upload:
+                        self.first_upload = False
+                
+                else:
+                    self.statusBar.showMessage(f'识别失败: {infer_info["error"]}')
+                    self.result_label.setText(f"识别失败: {infer_info['error']}")
             
-            self.result_label.setText(result_text)
-            self.statusBar.showMessage('识别完成')
+            except Exception as e:
+                self.statusBar.showMessage(f'发生错误: {str(e)}')
+                self.result_label.setText(f"发生错误: {str(e)}")
         else:
             self.statusBar.showMessage('请先上传图片')
     
@@ -140,12 +189,3 @@ class FoodRecognitionSystem(QMainWindow):
         if hasattr(self, 'current_image_path'):
             delattr(self, 'current_image_path')
         self.statusBar.showMessage('已清除所有内容')
-
-def main():
-    app = QApplication(sys.argv)
-    window = FoodRecognitionSystem()
-    window.show()
-    sys.exit(app.exec_())
-
-if __name__ == '__main__':
-    main()

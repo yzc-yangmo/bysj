@@ -5,7 +5,6 @@ import torch.nn as nn
 from torch.optim import AdamW
 from torch.utils.data import DataLoader 
 
-
 from data.dataset import FoodImageDataset
 from models import vit, resnet
 
@@ -31,7 +30,6 @@ train:
     notes: 备注
 '''
 config = json.load(open('./config.json'))
-mapping = json.load(open('./mapping.json'))
 
 # 检查配置文件是否正确
 if config["model"]["num_classes"] != 101 and str(config["model"]["num_classes"]) not in config["dataset"]["train_path"]:

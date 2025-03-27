@@ -1,9 +1,9 @@
 import os
 import sys
 from PyQt5.QtWidgets import QApplication
+from gui import FoodRecognitionSystem
 
-
-
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 def main():
     app = QApplication(sys.argv)
