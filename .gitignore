@@ -9,5 +9,9 @@ src/best_model.pth
 src/__pycache__/
 src/wandb/
 src/.ipynb_checkpoints/
+src/dist/
+src/build/
+
+
 
 dataset/*/
