@@ -5,8 +5,8 @@ import torch.nn.functional as F
 
 os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-num_classes = json.load(open('./config.json'))["model"]["num_classes"]
-drop_rate = json.load(open('./config.json'))["model"]["drop_rate"]
+num_classes = json.load(open('./config.json'))["train"]["num_classes"]
+drop_rate = json.load(open('./config.json'))["train"]["drop_rate"]
 
 class PatchEmbedding(nn.Module):
     """将图像分割成patch并进行线性嵌入"""

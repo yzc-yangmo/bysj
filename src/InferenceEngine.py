@@ -2,9 +2,11 @@ import os, json, time
 import torch
 from PIL import Image
 from data.transform import FoodImageTransform
-from models import vit, resnet
+from model import Model
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+config = json.load(open("config.json", "r", encoding="utf-8"))
 
 # {index: food_name}
 mapping = {v: k for k, v in json.load(open("mapping.json", "r", encoding="utf-8")).items()}
@@ -24,11 +26,12 @@ class InferenceEngine:
 
     def load_model(self, model_state_path):
         # 加载模型
-        model = vit.VisionTransformer()
+        model = Model(config["inference"]["name"]).get_model()
         
         # 读取模型参数
         if not os.path.exists(model_state_path):
             raise FileNotFoundError(f"not found model state file: {model_state_path}")
+        
         state_dict = torch.load(model_state_path, map_location=self.device)
         model.load_state_dict(state_dict)
         

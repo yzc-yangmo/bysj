@@ -1,15 +1,15 @@
-import os, sys
+import os, json
 import torch
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
+from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, 
                             QHBoxLayout, QPushButton, QLabel, QFileDialog, 
                             QScrollArea, QGridLayout, QGroupBox, QStatusBar)
-from PyQt5.QtGui import QPixmap, QImage, QFont, QIcon
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtGui import QPixmap,QFont, QIcon
+from PyQt5.QtCore import Qt
 from InferenceEngine import InferenceEngine
-from models import vit, resnet
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+config = json.load(open("config.json", "r", encoding="utf-8"))
 
 class FoodRecognitionSystem(QMainWindow):
     def __init__(self):
@@ -22,9 +22,9 @@ class FoodRecognitionSystem(QMainWindow):
     def load_model(self):
         try:
             
-            model_path = "vit_128_0.0002_0.3_DA-2-20250327111245-best_model.pth"
-            self.InferenceEngine_engine = InferenceEngine(model_path)
-            print("model load success, model path: ", model_path)
+            model_state_path = config["inference"]["model_path"]
+            self.InferenceEngine_engine = InferenceEngine(model_state_path)
+            print("model load success, model path: ", model_state_path)
         
         except Exception as e:
             self.statusBar.showMessage(f'发生错误: {str(e)}')

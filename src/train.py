@@ -6,8 +6,7 @@ from torch.optim import AdamW
 from torch.utils.data import DataLoader 
 
 from data.dataset import FoodImageDataset
-from models import vit, resnet
-
+from model import Model
 
 # 读取配置文件
 '''
@@ -32,11 +31,11 @@ train:
 config = json.load(open('./config.json'))
 
 # 检查配置文件是否正确
-if config["model"]["num_classes"] != 101 and str(config["model"]["num_classes"]) not in config["dataset"]["train_path"]:
+if config["train"]["num_classes"] != 101 and str(config["train"]["num_classes"]) not in config["train"]["dataset"]["train_path"]:
     raise ValueError("配置文件错误，num_classes 与 train_path 不匹配")
 
 demo_id = time.strftime('%Y%m%d%H%M%S')
-demo_name = f"{config['model']['name']}_{config['train']['batch_size']}_{config['train']['lr']}_{config['model']['drop_rate']}_DA-{config['train']['transform_type']}"
+demo_name = f"{config["train"]['name']}_{config['train']['batch_size']}_{config['train']['lr']}_{config["train"]['drop_rate']}_DA-{config['train']['transform_type']}"
 
 # 打印超参数
 print(f"----------------config----------------")
@@ -47,8 +46,8 @@ for k, v in config.items():
 
 # 读取数据集，训练集使用数据增强
 transform_type = config["train"]["transform_type"]
-train_foodimages = FoodImageDataset(config["dataset"]["train_path"], transform_type=1)  # 使用数据增强
-val_foodimages = FoodImageDataset(config["dataset"]["val_path"], transform_type = 0)  # 验证集使用简单变换
+train_foodimages = FoodImageDataset(config["train"]["dataset"]["train_path"], transform_type=transform_type)  # 使用数据增强
+val_foodimages = FoodImageDataset(config["train"]["dataset"]["val_path"], transform_type = 0)  # 验证集使用简单变换
 train_loader = DataLoader(train_foodimages, batch_size=config["train"]["batch_size"], shuffle=True)
 val_loader = DataLoader(val_foodimages, batch_size=config["train"]["batch_size"], shuffle=True)
 
@@ -57,7 +56,7 @@ def train_model(model, train_loader, val_loader):
     # 配置wandb
 
     if use_wandb:
-        wandb.init(project = f"sub-food-image-classification（num_classes = {config['model']['num_classes']}）", 
+        wandb.init(project = f"sub-food-image-classification（num_classes = {config['train']['num_classes']}）", 
                 name = demo_name,
                 config = config)
         wandb_log = {}
@@ -155,28 +154,16 @@ def train_model(model, train_loader, val_loader):
         # 打印训练信息
         print(f"{'='*50}\nTime: {time.strftime('%Y-%m-%d %H:%M:%S')}\nDemo Name: {demo_name}\n{'-'*50}\nEpoch [{epoch+1}/{num_epochs}]\nTrain Loss: {train_loss:.4f}      Val Loss: {val_loss:.4f}\nTrain Accuracy: {train_acc:.2f}%   Val Accuracy: {val_acc:.2f}%\nEpoch Time: {epoch_time:.2f} s \n")
 
-def get_model():
-    model_name = config["model"]["name"]
-    
-    if model_name == "resnet":
-        return resnet.resnet_v1()
-    
-    elif model_name == "vit":
-        return vit.VisionTransformer()
-    
-    else:
-        raise ValueError(f"不支持的模型: {model_name}")
-
-
 if __name__ == '__main__':
-    model = get_model()
+    model = Model(config["train"]["name"]).get_model()
+    
     use_wandb = config["train"]["use_wandb"]
     print("-----------------model----------------\n", model, "\n--------------------------------")
-    for file_name in os.listdir("./"):
-        if file_name.endswith('.pth'):
-            # 加载当前目录下的pth文件
-            model.load_state_dict(torch.load(file_name))
-            print(f"loading {file_name}")
-            break
+    # for file_name in os.listdir("./"):
+    #     if file_name.endswith('.pth'):
+    #         # 加载当前目录下的pth文件
+    #         model.load_state_dict(torch.load(file_name))
+    #         print(f"loading {file_name}")
+    #         break
         
     train_model(model, train_loader, val_loader)
