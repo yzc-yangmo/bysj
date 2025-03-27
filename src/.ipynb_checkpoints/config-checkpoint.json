@@ -1,20 +1,20 @@
 {
     "model": {
         "name": "vit",
-        "num_classes": 20,
+        "num_classes": 101,
         "drop_rate": 0.3
     },
     "dataset" : {
-        "train_path" : "../dataset/sub-train-20",
-        "val_path"   : "../dataset/sub-val-20"
+        "train_path" : "../dataset/train",
+        "val_path"   : "../dataset/val"
     },
     "train": {
-        "batch_size": 256,
-        "lr": 3e-4,
+        "batch_size": 128,
+        "lr": 2e-4,
         "num_epochs":300,
-        "weight_decay": 3e-4,
+        "weight_decay": 0.05,
         "use_wandb": true,
         "transform_type": 2,
-        "notes": "vit，引入数据增强"
+        "notes": "simplified vit"
     }   
 }

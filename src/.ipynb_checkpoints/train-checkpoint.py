@@ -11,6 +11,25 @@ from models import vit, resnet
 
 
 # 读取配置文件
+'''
+model:
+    name: 模型名称，vit or resnet
+    num_classes: 类别数量，总共101类
+    drop_rate: 随机失活率
+
+dataset:
+    train_path: 训练集路径
+    val_path: 验证集路径
+
+train:
+    batch_size: 批量大小
+    lr: 学习率
+    num_epochs: 训练轮数
+    weight_decay: 权重衰减
+    use_wandb: 是否使用wandb记录训练信息
+    transform_type: 数据增强类型，0: 简单变换，1: 数据增强，2: 增强数据增强
+    notes: 备注
+'''
 config = json.load(open('./config.json'))
 mapping = json.load(open('./mapping.json'))
 
@@ -19,7 +38,7 @@ if config["model"]["num_classes"] != 101 and str(config["model"]["num_classes"])
     raise ValueError("配置文件错误，num_classes 与 train_path 不匹配")
 
 demo_id = time.strftime('%Y%m%d%H%M%S')
-demo_name = f"{config['model']['name']}_{config['train']['batch_size']}_{config['train']['lr']}_{config['model']['drop_rate']}"
+demo_name = f"{config['model']['name']}_{config['train']['batch_size']}_{config['train']['lr']}_{config['model']['drop_rate']}_DA-{config['train']['transform_type']}"
 
 # 打印超参数
 print(f"----------------config----------------")
@@ -28,9 +47,10 @@ for k, v in config.items():
     for kk, vv in v.items():
         print(f"--{kk}: {vv}")
 
-# 读取数据集
-train_foodimages = FoodImageDataset(config["dataset"]["train_path"])
-val_foodimages = FoodImageDataset(config["dataset"]["val_path"])
+# 读取数据集，训练集使用数据增强
+transform_type = config["train"]["transform_type"]
+train_foodimages = FoodImageDataset(config["dataset"]["train_path"], transform_type=1)  # 使用数据增强
+val_foodimages = FoodImageDataset(config["dataset"]["val_path"], transform_type = 0)  # 验证集使用简单变换
 train_loader = DataLoader(train_foodimages, batch_size=config["train"]["batch_size"], shuffle=True)
 val_loader = DataLoader(val_foodimages, batch_size=config["train"]["batch_size"], shuffle=True)
 
@@ -112,6 +132,8 @@ def train_model(model, train_loader, val_loader):
         # 保存最佳模型
         if val_acc > best_val_acc:
             best_val_acc = val_acc
+            if not os.path.exists('./pth'):
+                os.makedirs('./pth')
             torch.save(model.state_dict(), f'./pth/{demo_name}-{demo_id}-best_model.pth')
         
         epoch_time = time.time() - epoch_start
@@ -127,7 +149,6 @@ def train_model(model, train_loader, val_loader):
                 "train_acc": train_acc,
                 "val_loss": val_loss,
                 "val_acc": val_acc,
-                "lr": optimizer.param_groups[0]['lr'],
                 "epoch_time" : epoch_time
             }
             # 记录训练信息到wandb
@@ -151,13 +172,13 @@ def get_model():
 
 if __name__ == '__main__':
     model = get_model()
-    use_wandb = True
+    use_wandb = config["train"]["use_wandb"]
     print("-----------------model----------------\n", model, "\n--------------------------------")
-    # for file_name in os.listdir("./"):
-    #     if file_name.endswith('.pth'):
-    #         # 加载当前目录下的pth文件
-    #         model.load_state_dict(torch.load(file_name))
-    #         print(f"loading {file_name}")
-    #         break
+    for file_name in os.listdir("./"):
+        if file_name.endswith('.pth'):
+            # 加载当前目录下的pth文件
+            model.load_state_dict(torch.load(file_name))
+            print(f"loading {file_name}")
+            break
         
     train_model(model, train_loader, val_loader)

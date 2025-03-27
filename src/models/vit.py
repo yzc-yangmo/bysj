@@ -137,8 +137,8 @@ class VisionTransformer(nn.Module):
         drop_rate (float): Dropout比率，
         attn_drop_rate (float): 注意力Dropout比率，
     """
-    def __init__(self, img_size=256, patch_size=8, in_channels=3, num_classes=num_classes,
-                 embed_dim=512, depth=8, n_heads=8, mlp_ratio=4.,
+    def __init__(self, img_size=256, patch_size=16, in_channels=3, num_classes=num_classes,
+                 embed_dim=384, depth=4, n_heads=6, mlp_ratio=4.,
                  qkv_bias=True, drop_rate=drop_rate, attn_drop_rate=0.1):
         super().__init__()
         

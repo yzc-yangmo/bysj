@@ -174,11 +174,11 @@ if __name__ == '__main__':
     model = get_model()
     use_wandb = config["train"]["use_wandb"]
     print("-----------------model----------------\n", model, "\n--------------------------------")
-    # for file_name in os.listdir("./"):
-    #     if file_name.endswith('.pth'):
-    #         # 加载当前目录下的pth文件
-    #         model.load_state_dict(torch.load(file_name))
-    #         print(f"loading {file_name}")
-    #         break
+    for file_name in os.listdir("./"):
+        if file_name.endswith('.pth'):
+            # 加载当前目录下的pth文件
+            model.load_state_dict(torch.load(file_name))
+            print(f"loading {file_name}")
+            break
         
     train_model(model, train_loader, val_loader)
