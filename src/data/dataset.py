@@ -7,17 +7,15 @@ from .transform import FoodImageTransform
 
 
 config = json.load(open('./config.json'))
-mapping = json.load(open('./mapping.json'))
 
 # 定义食物数据集
 class FoodImageDataset(Dataset):
     
-    def __init__(self, dataset_path, transform_type=1):
+    def __init__(self, dataset_path, transform_type):
         self.dataset_path = dataset_path
         self.transform = FoodImageTransform(transform_type)
         self.image_files = [os.path.join(dataset_path, f) for f in os.listdir(dataset_path) if f.endswith('.jpg')]
-        self.mapping = mapping if config["train"]["num_classes"] == 101 else dict(zip(set(i.split("-")[1] for i in os.listdir(config["train"]["dataset"]["train_path"])), range(config["train"]["num_classes"])))
-    
+
     # Implement __len__
     def __len__(self):
         return len(self.image_files)
@@ -37,8 +35,8 @@ class FoodImageDataset(Dataset):
         label = filename.split('-')[1]
         
         # 获取张量表示的标签
-        num_clsses = config["train"]["num_classes"]
-        label_tensor = torch.zeros(num_clsses)
-        label_tensor[self.mapping[label]] = 1
+        num_classes = config["train"]["num_classes"]
+        label_tensor = torch.zeros(num_classes)
+        label_tensor[int(label)] = 1 # 将标签转换为one-hot编码
         
         return image_tensor, label_tensor

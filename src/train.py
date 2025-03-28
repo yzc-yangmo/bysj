@@ -1,5 +1,6 @@
 import os, json, time
 import wandb
+from tqdm import tqdm
 import torch
 import torch.nn as nn
 from torch.optim import AdamW
@@ -10,16 +11,12 @@ from model import Model
 
 # 读取配置文件
 '''
-model:
-    name: 模型名称，vit or resnet
-    num_classes: 类别数量，总共101类
-    drop_rate: 随机失活率
-
 dataset:
+    name: 模型名称，vit or resnet
+    num_classes: 类别数量
+    drop_rate: 随机失活率
     train_path: 训练集路径
     val_path: 验证集路径
-
-train:
     batch_size: 批量大小
     lr: 学习率
     num_epochs: 训练轮数
@@ -27,11 +24,19 @@ train:
     use_wandb: 是否使用wandb记录训练信息
     transform_type: 数据增强类型，0: 简单变换，1: 数据增强，2: 增强数据增强
     notes: 备注
+
+inference:
+    name: 模型名称，vit or resnet
+    num_classes: 类别数量，总共101类
+    drop_rate: 随机失活率
+    model_path: 模型路径
+
 '''
+
 config = json.load(open('./config.json'))
 
 # 检查配置文件是否正确
-if config["train"]["num_classes"] != 101 and str(config["train"]["num_classes"]) not in config["train"]["dataset"]["train_path"]:
+if str(config["train"]["num_classes"]) not in config["train"]["dataset"]["train_path"]:
     raise ValueError("配置文件错误，num_classes 与 train_path 不匹配")
 
 demo_id = time.strftime('%Y%m%d%H%M%S')
@@ -86,7 +91,7 @@ def train_model(model, train_loader, val_loader):
         train_correct = 0
         train_total = 0
         
-        for images, labels in train_loader:
+        for images, labels in tqdm(train_loader):
             images, labels = images.to(device), labels.to(device)
             # 前向传播
             outputs = model(images)
@@ -162,7 +167,7 @@ if __name__ == '__main__':
     # for file_name in os.listdir("./"):
     #     if file_name.endswith('.pth'):
     #         # 加载当前目录下的pth文件
-    #         model.load_state_dict(torch.load(file_name))
+    #         model.load_state_dict(torch.load(file_name, weights_only=True))
     #         print(f"loading {file_name}")
     #         break
         

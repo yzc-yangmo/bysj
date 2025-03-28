@@ -25,20 +25,25 @@ class InferenceEngine:
     
 
     def load_model(self, model_state_path):
-        # 加载模型
-        model = Model(config["inference"]["name"]).get_model()
+        try:
+            # 加载模型
+            model = Model(config["inference"]["name"]).get_model()
+            
+            # 读取模型参数
+            if not os.path.exists(model_state_path):
+                raise FileNotFoundError(f"not found model state file: {model_state_path}")
+            
+            state_dict = torch.load(model_state_path, map_location=self.device)
+            model.load_state_dict(state_dict)
+            
+            model.to(self.device)
+            model.eval()
+            return model
         
-        # 读取模型参数
-        if not os.path.exists(model_state_path):
-            raise FileNotFoundError(f"not found model state file: {model_state_path}")
-        
-        state_dict = torch.load(model_state_path, map_location=self.device)
-        model.load_state_dict(state_dict)
-        
-        model.to(self.device)
-        model.eval()
-        return model
+        except Exception as e:
+            raise Exception(f"load model failed: {e}")
     
+
     def inference(self, image_path):
         try:
             start_time = time.time()

@@ -20,8 +20,4 @@ class Model:
     def get_model(self):
         return self.model
 
-    # 加载模型
-    def load_model_state(self, model_path):
-        self.model.load_state_dict(torch.load(model_path))
-
     

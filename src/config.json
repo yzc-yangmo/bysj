@@ -1,12 +1,12 @@
 {
     "train": {
         "name": "vit",
-        "num_classes": 101,
+        "num_classes": 256,
         "drop_rate": 0.3,
 
         "dataset" : {
-            "train_path" : "../dataset/sub-train-20",
-            "val_path"   : "../dataset/sub-val-20"
+            "train_path" : "../dataset/train-256",
+            "val_path"   : "../dataset/val-256"
         },
 
         "batch_size": 128,
