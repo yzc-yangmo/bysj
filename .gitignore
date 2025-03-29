@@ -13,7 +13,7 @@ src/wandb/
 src/.ipynb_checkpoints/
 src/dist/
 src/build/
-
+src/config.json
 
 
 dataset/*/
