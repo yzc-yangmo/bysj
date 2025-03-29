@@ -61,7 +61,7 @@ def train_model(model, train_loader, val_loader):
     # 配置wandb
 
     if use_wandb:
-        wandb.init(project = f"sub-food-image-classification（num_classes = {config['train']['num_classes']}）", 
+        wandb.init(project = f"bysj-chn-food（num_classes = {config['train']['num_classes']}）", 
                 name = demo_name,
                 config = config)
         wandb_log = {}
@@ -136,7 +136,9 @@ def train_model(model, train_loader, val_loader):
             best_val_acc = val_acc
             if not os.path.exists('./pth'):
                 os.makedirs('./pth')
-            torch.save(model.state_dict(), f'./pth/{demo_name}-{demo_id}-best_model.pth')
+            pth_path = f'./pth/{demo_name}-{demo_id}-best_model.pth'
+            torch.save(model.state_dict(), pth_path)
+            print(f"model saved successfully, path {pth_path}")
         
         epoch_time = time.time() - epoch_start
         
@@ -164,11 +166,6 @@ if __name__ == '__main__':
     
     use_wandb = config["train"]["use_wandb"]
     print("-----------------model----------------\n", model, "\n--------------------------------")
-    # for file_name in os.listdir("./"):
-    #     if file_name.endswith('.pth'):
-    #         # 加载当前目录下的pth文件
-    #         model.load_state_dict(torch.load(file_name, weights_only=True))
-    #         print(f"loading {file_name}")
-    #         break
-        
+    model.load_state_dict(torch.load("vit_128_0.001_0.3_DA-2-20250328203947-best_model.pth", weights_only=True))
+    
     train_model(model, train_loader, val_loader)

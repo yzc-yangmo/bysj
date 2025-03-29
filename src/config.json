@@ -1,19 +1,19 @@
 {
     "train": {
         "name": "vit",
-        "num_classes": 256,
+        "num_classes": 50,
         "drop_rate": 0.3,
 
         "dataset" : {
-            "train_path" : "../dataset/train-256",
-            "val_path"   : "../dataset/val-256"
+            "train_path" : "../dataset/train-50",
+            "val_path"   : "../dataset/val-50"
         },
 
         "batch_size": 128,
-        "lr": 2e-4,
-        "num_epochs":300,
+        "lr": 1e-3,
+        "num_epochs":1000,
         "weight_decay": 0.05,
-        "use_wandb": false,
+        "use_wandb": true,
         "transform_type": 2,
         "notes": "simplified vit"
     },
