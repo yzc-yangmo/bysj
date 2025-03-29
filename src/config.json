@@ -2,7 +2,7 @@
     "train": {
         "name": "vit",
         "num_classes": 50,
-        "drop_rate": 0.3,
+        "drop_rate": 0.2,
 
         "dataset" : {
             "train_path" : "../dataset/train-50",
@@ -10,12 +10,12 @@
         },
 
         "batch_size": 128,
-        "lr": 1e-3,
-        "num_epochs":1000,
-        "weight_decay": 0.05,
+        "lr": 5e-4,
+        "num_epochs": 1000,
+        "weight_decay": 0.01,
         "use_wandb": true,
         "transform_type": 2,
-        "notes": "simplified vit"
+        "notes": "enhanced vit for better fitting"
     },
     
     "inference": {

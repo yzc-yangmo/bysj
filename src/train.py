@@ -80,6 +80,9 @@ def train_model(model, train_loader, val_loader):
     criterion = nn.CrossEntropyLoss()
     optimizer = AdamW(model.parameters(), lr=lr, weight_decay=weight_decay, betas=(0.9, 0.999))
     
+    # 添加学习率调度器
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs, eta_min=1e-6)
+    
     best_val_acc = 0.0
     
     print(f"trian start! \nDemo_Id: {demo_id} \nDemo_Name: {demo_name}")
@@ -145,6 +148,9 @@ def train_model(model, train_loader, val_loader):
         # 计算平均损失
         train_loss, val_loss = train_loss/len(train_loader), val_loss/len(val_loader)
         
+        # 学习率调度器更新
+        scheduler.step()
+        current_lr = optimizer.param_groups[0]['lr']
         
         # 记录wandb信息
         if use_wandb:
@@ -153,7 +159,8 @@ def train_model(model, train_loader, val_loader):
                 "train_acc": train_acc,
                 "val_loss": val_loss,
                 "val_acc": val_acc,
-                "epoch_time" : epoch_time
+                "epoch_time": epoch_time,
+                "learning_rate": current_lr  # 添加学习率记录
             }
             # 记录训练信息到wandb
             wandb.log(wandb_log)
@@ -166,6 +173,6 @@ if __name__ == '__main__':
     
     use_wandb = config["train"]["use_wandb"]
     print("-----------------model----------------\n", model, "\n--------------------------------")
-    model.load_state_dict(torch.load("vit_128_0.001_0.3_DA-2-20250328203947-best_model.pth", weights_only=True))
+    # model.load_state_dict(torch.load("vit_128_0.001_0.3_DA-2-20250328203947-best_model.pth", weights_only=True))
     
     train_model(model, train_loader, val_loader)

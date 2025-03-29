@@ -78,7 +78,7 @@ class Attention(nn.Module):
 class MLP(nn.Module):
     """Feed Forward 网络"""
     
-    def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.ReLU, drop=drop_rate):
+    def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU, drop=drop_rate):
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
@@ -140,7 +140,7 @@ class VisionTransformer(nn.Module):
         attn_drop_rate (float): 注意力Dropout比率，
     """
     def __init__(self, img_size=256, patch_size=16, in_channels=3, num_classes=num_classes,
-                 embed_dim=384, depth=4, n_heads=6, mlp_ratio=4.,
+                 embed_dim=512, depth=6, n_heads=8, mlp_ratio=6.,
                  qkv_bias=True, drop_rate=drop_rate, attn_drop_rate=0.1):
         super().__init__()
         
