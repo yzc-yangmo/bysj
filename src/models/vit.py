@@ -115,12 +115,9 @@ class TransformerBlock(nn.Module):
         )
     
     def forward(self, x):
-        # 自注意力层
         x = x + self.attn(self.norm1(x))
-        # FFN层
         x = x + self.mlp(self.norm2(x))
         return x
-
 
 class VisionTransformer(nn.Module):
     """
@@ -174,25 +171,30 @@ class VisionTransformer(nn.Module):
         
         # 层归一化和分类头
         self.norm = nn.LayerNorm(embed_dim)
-        self.head = nn.Linear(embed_dim, num_classes)
+        self.head = nn.Sequential(
+            nn.Linear(embed_dim, embed_dim * 2),
+            nn.GELU(),
+            nn.Dropout(drop_rate),
+            nn.Linear(embed_dim * 2, num_classes)
+        )
         
         # 初始化权重
         self._init_weights()
     
     def _init_weights(self):
-        # 初始化类别token
-        nn.init.normal_(self.cls_token, std=0.02)
-        # 初始化位置嵌入
-        nn.init.normal_(self.pos_embed, std=0.02)
+        # 初始化cls_token和pos_embed
+        nn.init.trunc_normal_(self.cls_token, std=0.02)
+        nn.init.trunc_normal_(self.pos_embed, std=0.02)
         
-        # 初始化所有线性层和层归一化
-        self.apply(self._init_weights_layers)
-        
-        
-        
-    
-    def _init_weights_layers(self, m):
+        # 应用初始化到所有模块
+        self.apply(self._init_module)
+
+    def _init_module(self, m):
         if isinstance(m, nn.Linear):
+            nn.init.trunc_normal_(m.weight, std=0.02)
+            if m.bias is not None:
+                nn.init.constant_(m.bias, 0)
+        elif isinstance(m, nn.Conv2d):
             nn.init.trunc_normal_(m.weight, std=0.02)
             if m.bias is not None:
                 nn.init.constant_(m.bias, 0)
