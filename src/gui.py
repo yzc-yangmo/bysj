@@ -165,7 +165,7 @@ class FoodRecognitionSystem(QMainWindow):
                     result_text = f"""
                     <p><b>食物名称:</b> {infer_info["food_name"]}</p>
                     <p><b>置信度:</b> {infer_info["confidence"]:.1f}%</p>
-                    <p><b>耗时:</b> {infer_info["inference_time"]:.2f} 秒</p>
+                    <p><b>耗时:</b> {infer_info["inference_time"]:.4f} 秒</p>
                     <p><br></p>
                     <p><b>营养成分:</b></p>
                     <p><b>热量:</b> {infer_info["nutrition_info"]["calories"]} kcal</p>
@@ -262,7 +262,7 @@ class FoodRecognitionSystem(QMainWindow):
                         <p><b>图片名称:</b> {image_file}</p>
                         <p><b>食物名称:</b> {infer_info["food_name"]}</p>
                         <p><b>置信度:</b> {infer_info["confidence"]:.1f}%</p>
-                        <p><b>耗时:</b> {infer_info["inference_time"]:.2f} 秒</p>
+                        <p><b>耗时:</b> {infer_info["inference_time"]:.4f} 秒</p>
                         <p><br></p>
                         <p><b>营养成分:</b></p>
                         <p><b>热量:</b> {infer_info["nutrition_info"]["calories"]} kcal</p>
