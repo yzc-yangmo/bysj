@@ -3,6 +3,7 @@
 *.parquet
 *.zip
 *.pth
+*.pyc
 
 src/log/
 src/best_model.pth
@@ -13,7 +14,7 @@ src/wandb/
 src/.ipynb_checkpoints/
 src/dist/
 src/build/
-
+src/config.json
 
 
 dataset/*/

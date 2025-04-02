@@ -1,5 +1,6 @@
 import os, json
 import torch
+import csv
 from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, 
                             QHBoxLayout, QPushButton, QLabel, QFileDialog, 
                             QScrollArea, QGridLayout, QGroupBox, QStatusBar)
@@ -84,14 +85,17 @@ class FoodRecognitionSystem(QMainWindow):
         
         self.upload_btn = QPushButton('上传图片')
         self.upload_btn.clicked.connect(self.upload_image)
+        self.upload_dir_btn = QPushButton('上传文件夹')
+        self.upload_dir_btn.clicked.connect(self.upload_directory)
         self.recognize_btn = QPushButton('识别食物')
         self.recognize_btn.clicked.connect(self.recognize_food)
         self.clear_btn = QPushButton('清除')
         self.clear_btn.clicked.connect(self.clear_all)
         
         control_layout.addWidget(self.upload_btn, 0, 0)
+        control_layout.addWidget(self.upload_dir_btn, 1, 0)
         control_layout.addWidget(self.recognize_btn, 0, 1)
-        control_layout.addWidget(self.clear_btn, 1, 0, 1, 2)
+        control_layout.addWidget(self.clear_btn, 1, 1)
         
         control_group.setLayout(control_layout)
         right_layout.addWidget(control_group)
@@ -140,6 +144,14 @@ class FoodRecognitionSystem(QMainWindow):
             else:
                 self.statusBar.showMessage('无法加载图片')
     
+    def upload_directory(self):
+        """上传文件夹功能"""
+        dir_path = QFileDialog.getExistingDirectory(self, '选择文件夹')
+        if dir_path:
+            self.current_dir_path = dir_path
+            self.statusBar.showMessage(f'已选择文件夹: {dir_path}')
+            self.recognize_directory()
+
     def recognize_food(self):
         """识别食物功能"""
         if hasattr(self, 'current_image_path'):
@@ -180,6 +192,66 @@ class FoodRecognitionSystem(QMainWindow):
                 self.result_label.setText(f"发生错误: {str(e)}")
         else:
             self.statusBar.showMessage('请先上传图片')
+    
+    def recognize_directory(self):
+        """批量识别文件夹中的图片"""
+        if not hasattr(self, 'current_dir_path'):
+            self.statusBar.showMessage('请先选择文件夹')
+            return
+
+        # 支持的图片格式
+        image_extensions = ('.jpg', '.jpeg', '.png')
+        
+        # 获取文件夹中所有图片文件
+        image_files = [f for f in os.listdir(self.current_dir_path) 
+                      if f.lower().endswith(image_extensions)]
+        
+        if not image_files:
+            self.statusBar.showMessage('文件夹中没有找到支持的图片文件')
+            return
+
+        # 准备CSV文件
+        csv_path = os.path.join(self.current_dir_path, 'recognition_results.csv')
+        csv_headers = ['图片名称', '食物名称', '置信度', '识别耗时(秒)', 
+                      '热量(kcal)', '蛋白质(g)', '脂肪(g)', '碳水化合物(g)']
+
+        try:
+            with open(csv_path, 'w', newline='', encoding='utf-8-sig') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(csv_headers)
+                
+                total_images = len(image_files)
+                for i, image_file in enumerate(image_files, 1):
+                    image_path = os.path.join(self.current_dir_path, image_file)
+                    self.statusBar.showMessage(f'正在处理: {image_file} ({i}/{total_images})')
+                    
+                    # 进行推理
+                    infer_info = self.InferenceEngine_engine.inference(image_path)
+                    
+                    if infer_info["success"]:
+                        writer.writerow([
+                            image_file,
+                            infer_info["food_info"]["chn"],
+                            f"{infer_info['confidence']:.1f}%",
+                            f"{infer_info['inference_time']:.2f}",
+                            infer_info["food_info"]["calories"],
+                            infer_info["food_info"]["protein"],
+                            infer_info["food_info"]["fat"],
+                            infer_info["food_info"]["carb"]
+                        ])
+                    else:
+                        writer.writerow([
+                            image_file,
+                            f"识别失败: {infer_info['error']}",
+                            "", "", "", "", "", ""
+                        ])
+
+            self.statusBar.showMessage(f'批量识别完成，结果已保存至: {csv_path}')
+            self.result_label.setText(f'批量识别完成，共处理 {total_images} 张图片\n结果已保存至: {csv_path}')
+            
+        except Exception as e:
+            self.statusBar.showMessage(f'批量识别过程中发生错误: {str(e)}')
+            self.result_label.setText(f"批量识别过程中发生错误: {str(e)}")
     
     def clear_all(self):
         """清除所有内容"""
