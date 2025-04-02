@@ -15,7 +15,9 @@ src/wandb/
 src/.ipynb_checkpoints/
 src/dist/
 src/build/
+src/recognition-results/
 src/config.json
+
 
 
 dataset/*/

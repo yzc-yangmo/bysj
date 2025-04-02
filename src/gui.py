@@ -24,7 +24,6 @@ class FoodRecognitionSystem(QMainWindow):
     # 创建推理实例
     def load_model(self):
         try:
-            
             self.InferenceEngine = InferenceEngine()
             print("model load success!")
         
@@ -217,10 +216,13 @@ class FoodRecognitionSystem(QMainWindow):
             return
 
         # 准备CSV文件
-        csv_path = f'recognition-results-{time.strftime("%Y%m%d%H%M%S")}.csv'
+        recognition_results_dir = "./recognition-results"
+        csv_path = os.path.join(recognition_results_dir, f'recognition-results-{time.strftime("%Y%m%d%H%M%S")}.csv')
         csv_headers = ['图片名称', '食物名称', '置信度', '识别耗时(秒)', 
                       '热量(kcal)', '蛋白质(g)', '脂肪(g)', '碳水化合物(g)']
-
+        if not os.path.exists(recognition_results_dir):
+            os.makedirs(recognition_results_dir)
+        
         # 记录开始时间
         start_time = time.time()
         
