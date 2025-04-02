@@ -2,11 +2,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug src/main.py",
-            "type": "debugpy",
+            "name": "Python: Current File",
+            "type": "python",
             "request": "launch",
-            "program": "${file}", 
-            "cwd": "D:\\Desktop\\bysj\\bysj\\src"
+            "program": "${file}",
+            "cwd": "${workspaceFolder}/src",  // 关键修改：设置工作目录为 src
+            "console": "integratedTerminal"
         }
     ]
 }
