@@ -19,9 +19,9 @@ cd src
 python/python3 train.py
 ```
 
-## 推理
+## 主程序
 
 ```bash
-python main.py
+cd src
+python/python3 main.py
 ```
-
