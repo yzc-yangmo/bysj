@@ -4,6 +4,7 @@
 *.zip
 *.pth
 *.pyc
+*.csv
 
 src/log/
 src/best_model.pth
