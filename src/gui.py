@@ -25,9 +25,8 @@ class FoodRecognitionSystem(QMainWindow):
     def load_model(self):
         try:
             
-            model_state_path = config["inference"]["model_path"]
-            self.InferenceEngine_engine = InferenceEngine(model_state_path)
-            print("model load success, model path: ", model_state_path)
+            self.InferenceEngine = InferenceEngine()
+            print("model load success!")
         
         except Exception as e:
             self.statusBar.showMessage(f'发生错误: {str(e)}')
@@ -158,7 +157,7 @@ class FoodRecognitionSystem(QMainWindow):
             
             try:
                 # 进行推理
-                infer_info = self.InferenceEngine_engine.inference(self.current_image_path)
+                infer_info = self.InferenceEngine.inference(self.current_image_path)
                 
                 if infer_info["success"]:
                     # 构建结果显示
@@ -243,7 +242,7 @@ class FoodRecognitionSystem(QMainWindow):
                     self.show_image(image_path)
                     
                     # 进行推理
-                    infer_info = self.InferenceEngine_engine.inference(image_path)
+                    infer_info = self.InferenceEngine.inference(image_path)
                     
                     if infer_info["success"]:
                         writer.writerow([

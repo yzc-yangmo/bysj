@@ -11,27 +11,28 @@ config = json.load(open("config.json", "r", encoding="utf-8"))
 food_info = json.load(open("food-info.json", "r", encoding="utf-8"))
 
 class InferenceEngine:
-    def __init__(self, model_path):
+    def __init__(self):
         # 设置设备
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         # 加载模型
-        self.model = self.load_model(model_path)
+        self.model = self.load_model()
         # 定义图像预处理
         self.transform = FoodImageTransform(transform_type=0)
     
-
-    def load_model(self, model_state_path):
+    # 读取配置文件加载模型
+    def load_model(self):
         try:
             # 加载模型
             model = Model(config["inference"]["name"]).get_model()
             
             # 读取模型参数
+            model_state_path = config["inference"]["model_path"]
             if not os.path.exists(model_state_path):
                 raise FileNotFoundError(f"not found model state file: {model_state_path}")
-            
             state_dict = torch.load(model_state_path, map_location=self.device)
             model.load_state_dict(state_dict)
             
+            # 将模型移动到GPU并设置为评估模式
             model.to(self.device)
             model.eval()
             return model

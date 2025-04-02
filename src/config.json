@@ -20,8 +20,6 @@
     
     "inference": {
         "name": "vit",
-        "num_classes": 256,
-        "drop_rate": 0.3,
         "model_path": "vit_128_0.0001_0.2_DA-2-20250330143538-best_model.pth"
     }
 }
