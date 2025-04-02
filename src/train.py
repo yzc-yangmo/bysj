@@ -168,11 +168,19 @@ def train_model(model, train_loader, val_loader):
         # 打印训练信息
         print(f"{'='*50}\nTime: {time.strftime('%Y-%m-%d %H:%M:%S')}\nDemo Name: {demo_name}\n{'-'*50}\nEpoch [{epoch+1}/{num_epochs}]\nTrain Loss: {train_loss:.4f}      Val Loss: {val_loss:.4f}\nTrain Accuracy: {train_acc:.2f}%   Val Accuracy: {val_acc:.2f}%\nEpoch Time: {epoch_time:.2f} s \n")
 
+# 设置遇到错误时自动回退到eager模式
+torch._dynamo.config.suppress_errors = True
+
 if __name__ == '__main__':
-    model = Model(config["train"]["name"]).get_model()
+    # 使用更保守的编译参数
+    model = Model(config["train"]["name"]).get_model(
+        compile=True,
+        mode='reduce-overhead',  # 使用更少开销的模式
+        dynamic=False,  # 禁用动态形状支持，这对解决符号大小问题很重要
+        fullgraph=False  # 不使用完整图编译
+    )
     
     use_wandb = config["train"]["use_wandb"]
     print("-----------------model----------------\n", model, "\n--------------------------------")
-    # model.load_state_dict(torch.load("vit_128_0.001_0.3_DA-2-20250328203947-best_model.pth", weights_only=True))
     
     train_model(model, train_loader, val_loader)

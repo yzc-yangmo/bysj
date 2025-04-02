@@ -152,15 +152,15 @@ class FoodRecognitionSystem(QMainWindow):
                 if infer_info["success"]:
                     # 构建结果显示
                     result_text = f"""
-                    <p><b>食物名称:</b> {infer_info["food_info"]["chn"]}</p>
+                    <p><b>食物名称:</b> {infer_info["food_name"]}</p>
                     <p><b>置信度:</b> {infer_info["confidence"]:.1f}%</p>
                     <p><b>耗时:</b> {infer_info["inference_time"]:.2f} 秒</p>
                     <p><br></p>
                     <p><b>营养成分:</b></p>
-                    <p><b>热量:</b> {infer_info["food_info"]["calories"]} kcal</p>
-                    <p><b>蛋白质:</b> {infer_info["food_info"]["protein"]} g</p>
-                    <p><b>脂肪:</b> {infer_info["food_info"]["fat"]} g</p>
-                    <p><b>碳水化合物:</b> {infer_info["food_info"]["carb"]} g </p>
+                    <p><b>热量:</b> {infer_info["nutrition_info"]["calories"]} kcal</p>
+                    <p><b>蛋白质:</b> {infer_info["nutrition_info"]["protein"]} g</p>
+                    <p><b>脂肪:</b> {infer_info["nutrition_info"]["fat"]} g</p>
+                    <p><b>碳水化合物:</b> {infer_info["nutrition_info"]["carb"]} g </p>
                     <p><b>以上数据为100g食物的营养成分</b></p>
                     """
                     

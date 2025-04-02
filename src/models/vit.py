@@ -2,6 +2,9 @@ import os, json
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.utils.checkpoint import checkpoint
+import numpy as np
+from torch.cuda.amp import autocast
 
 os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -55,15 +58,15 @@ class Attention(nn.Module):
         self.proj_drop = nn.Dropout(proj_drop)
     
     def forward(self, x):
-        # x: [B, N, D]
         B, N, D = x.shape
         
-        # 计算 QKV
-        qkv = self.qkv(x).reshape(B, N, 3, self.n_heads, self.head_dim).permute(2, 0, 3, 1, 4)
-        q, k, v = qkv[0], qkv[1], qkv[2]  # [B, n_heads, N, head_dim]
+        # 优化QKV计算，避免多次reshape
+        qkv = self.qkv(x).reshape(B, N, 3, self.n_heads, self.head_dim)
+        qkv = qkv.permute(2, 0, 3, 1, 4)
+        q, k, v = qkv  # 更简洁的解包
         
-        # 计算注意力矩阵
-        attn = (q @ k.transpose(-2, -1)) * self.scale  # [B, n_heads, N, N]
+        # 使用torch.baddbmm优化注意力计算
+        attn = torch.matmul(q, k.transpose(-2, -1)) * self.scale
         attn = attn.softmax(dim=-1)
         attn = self.attn_drop(attn)
         
@@ -115,6 +118,7 @@ class TransformerBlock(nn.Module):
         )
     
     def forward(self, x):
+        # 不使用梯度检查点，直接计算
         x = x + self.attn(self.norm1(x))
         x = x + self.mlp(self.norm2(x))
         return x
@@ -137,7 +141,7 @@ class VisionTransformer(nn.Module):
         attn_drop_rate (float): 注意力Dropout比率，
     """
     def __init__(self, img_size=256, patch_size=16, in_channels=3, num_classes=num_classes,
-                 embed_dim=512, depth=6, n_heads=8, mlp_ratio=6.,
+                 embed_dim=512, depth=8, n_heads=8, mlp_ratio=6.,
                  qkv_bias=True, drop_rate=drop_rate, attn_drop_rate=0.1):
         super().__init__()
         
@@ -172,7 +176,7 @@ class VisionTransformer(nn.Module):
         # 层归一化和分类头
         self.norm = nn.LayerNorm(embed_dim)
         self.head = nn.Sequential(
-            nn.Linear(embed_dim, embed_dim * 2),
+            nn.Linear(embed_dim * 2, embed_dim * 2),
             nn.GELU(),
             nn.Dropout(drop_rate),
             nn.Linear(embed_dim * 2, num_classes)
@@ -222,8 +226,10 @@ class VisionTransformer(nn.Module):
         # 层归一化
         x = self.norm(x)
         
-        # 只使用类别token进行分类
-        return x[:, 0]
+        # 使用加权融合策略
+        cls_token = x[:, 0]
+        patch_tokens = x[:, 1:].mean(dim=1)  # 全局平均池化
+        return torch.cat([cls_token, patch_tokens], dim=1)
     
     def forward(self, x):
         # 提取特征

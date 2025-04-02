@@ -7,11 +7,7 @@ from model import Model
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 config = json.load(open("config.json", "r", encoding="utf-8"))
-
-# {index: food_name}
-mapping = {v: k for k, v in json.load(open("mapping.json", "r", encoding="utf-8")).items()}
-
-# {food_name: {chn: str, calories: int, protein: int, fat: int, carb: int}}
+# {food_id: {chn: str, calories: int, protein: int, fat: int, carb: int}}
 food_info = json.load(open("food-info.json", "r", encoding="utf-8"))
 
 class InferenceEngine:
@@ -61,13 +57,19 @@ class InferenceEngine:
             confidence, class_idx = torch.max(probabilities, 0)
             confidence_value = confidence.item() * 100
             class_idx = class_idx.item()
-            food_name = mapping[class_idx]
-            
+            food_name = food_info[str(class_idx)]["chn"]
+            # 食物的营养信息
+            nutrition_info = {
+                "calories": food_info[str(class_idx)]["calories"],
+                "protein": food_info[str(class_idx)]["protein"],
+                "fat": food_info[str(class_idx)]["fat"],
+                "carb": food_info[str(class_idx)]["carb"]
+            }
             return {
                 "success": True,
-                "food_name_eng": food_name,
+                "food_name": food_name,
                 "confidence": confidence_value,
-                "food_info": food_info[food_name], # {food_name: {chn: str, calories: int, protein: int, fat: int, carb: int}}
+                "nutrition_info": nutrition_info,
                 "inference_time": time.time() - start_time
             }
         except Exception as e:

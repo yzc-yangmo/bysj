@@ -19,5 +19,3 @@ class Model:
     # 获取模型
     def get_model(self):
         return self.model
-
-    
