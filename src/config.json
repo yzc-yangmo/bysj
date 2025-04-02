@@ -1,8 +1,8 @@
 {
     "train": {
-        "name": "vit",
+        "name": "resnet",
         "num_classes": 256,
-        "drop_rate": 0.2,
+        "drop_rate": 0.1,
 
         "dataset" : {
             "train_path" : "../dataset/train-256",
@@ -10,7 +10,7 @@
         },
 
         "batch_size": 128,
-        "lr": 5e-4,
+        "lr": 1e-4,
         "num_epochs": 1000,
         "weight_decay": 0.01,
         "use_wandb": false,

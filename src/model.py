@@ -12,8 +12,10 @@ class Model:
         # 包括：vit, resnet, vgg
         if self.model_name == "vit":
             return vit.VisionTransformer()
+        
         elif self.model_name == "resnet":
             return resnet.ResNet()
+        
         elif self.model_name == "vgg":
             return vgg.VGG()
         else:
