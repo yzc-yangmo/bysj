@@ -40,7 +40,7 @@ if str(config["train"]["num_classes"]) not in config["train"]["dataset"]["train_
     raise ValueError("配置文件错误，num_classes 与 train_path 不匹配")
 
 demo_id = time.strftime('%Y%m%d%H%M%S')
-demo_name = f"{config["train"]['name']}_{config['train']['batch_size']}_{config['train']['lr']}_{config["train"]['drop_rate']}_DA-{config['train']['transform_type']}"
+demo_name = f'{config["train"]["name"]}_{config["train"]["batch_size"]}_{config["train"]["lr"]}_{config["train"]["drop_rate"]}_DA-{config["train"]["transform_type"]}'
 
 # 打印超参数
 print(f"----------------config----------------")
@@ -61,7 +61,7 @@ def train_model(model, train_loader, val_loader):
     # 配置wandb
 
     if use_wandb:
-        wandb.init(project = f"bysj-chn-food（num_classes = {config['train']['num_classes']}）", 
+        wandb.init(project = f"bysj（num_classes = {config['train']['num_classes']}）", 
                 name = demo_name,
                 config = config)
         wandb_log = {}
@@ -85,7 +85,7 @@ def train_model(model, train_loader, val_loader):
     
     best_val_acc = 0.0
     
-    print(f"trian start! \nDemo_Id: {demo_id} \nDemo_Name: {demo_name}")
+    print(f'trian start! \nDemo_Id: {demo_id} \nDemo_Name: {demo_name}')
     for epoch in range(num_epochs):
         epoch_start = time.time()
         # 训练阶段
@@ -174,5 +174,6 @@ if __name__ == '__main__':
     
     use_wandb = config["train"]["use_wandb"]
     print("-----------------model----------------\n", model, "\n--------------------------------")
+    # model.load_state_dict(torch.load("vit_128_0.0001_0.2_DA-2-20250330143538-best_model.pth", weights_only=True))
     
     train_model(model, train_loader, val_loader)
