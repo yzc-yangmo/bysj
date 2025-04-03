@@ -3,6 +3,7 @@ from PIL import Image
 import torch
 from torchvision import transforms
 from torch.utils.data import Dataset
+from torchvision.transforms import RandAugment
 
 class FoodImageTransform:
 
@@ -32,13 +33,11 @@ class FoodImageTransform:
             self.transform = transforms.Compose([
                 transforms.RandomResizedCrop(256),
                 transforms.RandomHorizontalFlip(),
-                transforms.RandomVerticalFlip(),
-                transforms.RandomRotation(15),
-                transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.1),
-                transforms.RandomGrayscale(p=0.1),
+                transforms.RandomRotation(30),
+                transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.2),
                 transforms.ToTensor(),
                 transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-                transforms.RandomErasing(p=0.2)
+                transforms.RandomErasing(p=0.4, scale=(0.1, 0.5))
             ])
             
         else:
