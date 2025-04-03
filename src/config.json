@@ -2,7 +2,7 @@
     "train": {
         "name": "resnet",
         "num_classes": 256,
-        "drop_rate": 0.1,
+        "drop_rate": 0.15,
 
         "dataset" : {
             "train_path" : "../dataset/train-256",
@@ -13,9 +13,9 @@
         "lr": 1e-4,
         "num_epochs": 1000,
         "weight_decay": 0.01,
-        "use_wandb": false,
+        "use_wandb": true,
         "transform_type": 2,
-        "notes": "enhanced vit for better fitting"
+        "notes": "resnet40"
     },
     
     "inference": {
