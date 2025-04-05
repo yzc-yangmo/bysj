@@ -174,6 +174,12 @@ if __name__ == '__main__':
     
     use_wandb = config["train"]["use_wandb"]
     print("-----------------model----------------\n", model, "\n--------------------------------")
-    # model.load_state_dict(torch.load("vit_128_0.0001_0.2_DA-2-20250330143538-best_model.pth", weights_only=True))
     
+    # 继续训练
+    if config["train"]["continue_train"]["use_continue"]:
+        model.load_state_dict(torch.load(config["train"]["continue_train"]["model_path"], weights_only=True))
+        print(f"continue train from {config['train']['continue_train']['model_path']}")
+    else:
+        print("not continue train")
+        
     train_model(model, train_loader, val_loader)

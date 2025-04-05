@@ -1,21 +1,25 @@
 {
     "train": {
         "name": "resnet",
-        "num_classes": 256,
-        "drop_rate": 0.15,
-
+        "num_classes": 50,
+        "drop_rate": 0.1,
         "dataset" : {
-            "train_path" : "../dataset/train-256",
-            "val_path"   : "../dataset/val-256"
+            "train_path" : "../dataset/train-50",
+            "val_path"   : "../dataset/val-50"
         },
 
         "batch_size": 128,
         "lr": 1e-4,
         "num_epochs": 1000,
         "weight_decay": 0.01,
-        "use_wandb": true,
+        "use_wandb": false,
         "transform_type": 2,
-        "notes": "resnet40"
+        "notes": "resnet40",
+
+        "continue_train":{
+            "use_continue": false,
+            "model_path": "vit_128_0.0001_0.2_DA-2-20250330143538-best_model.pth"
+        }
     },
     
     "inference": {
