@@ -12,9 +12,9 @@
         "lr": 1e-4,
         "num_epochs": 1000,
         "weight_decay": 0.01,
-        "use_wandb": false,
+        "use_wandb": true,
         "transform_type": 2,
-        "notes": "resnet40",
+        "notes": "",
 
         "continue_train":{
             "use_continue": false,
@@ -24,6 +24,6 @@
     
     "inference": {
         "name": "vit",
-        "model_path": "vit_128_0.0001_0.2_DA-2-20250330143538-best_model.pth"
+        "model_path": "./pth/best/vit_128_0.0001_0.1_DA-2-20250405080337-best_model.pth"
     }
 }

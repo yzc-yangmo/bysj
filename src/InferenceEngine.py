@@ -8,22 +8,27 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 config = json.load(open("config.json", "r", encoding="utf-8"))
 # {food_id: {chn: str, calories: int, protein: int, fat: int, carb: int}}
-food_info = json.load(open("food-info.json", "r", encoding="utf-8"))
+food_info = json.load(open("food-info-50.json", "r", encoding="utf-8"))
 
 class InferenceEngine:
-    def __init__(self):
+    def __init__(self, model_name=None):
         # 设置设备
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        # 加载模型
-        self.model = self.load_model()
         # 定义图像预处理
         self.transform = FoodImageTransform(transform_type=0)
+        # 加载模型
+        if model_name is not None:
+            self.model = self.load_model_by_name(model_name)
+        else:   
+            self.model = self.load_model()
     
     # 读取配置文件加载模型
     def load_model(self):
         try:
             # 加载模型
-            model = Model(config["inference"]["name"]).get_model()
+            model_name = config["inference"]["name"]
+            model = Model(model_name).get_model()
+            print(f"use : {model_name}")
             
             # 读取模型参数
             model_state_path = config["inference"]["model_path"]
@@ -40,7 +45,33 @@ class InferenceEngine:
         except Exception as e:
             raise Exception(f"load model failed: {e}")
     
-
+    # 加载指定名称的模型
+    def load_model_by_name(self, model_name):   
+        try:
+            # 加载模型
+            model = Model(model_name).get_model()
+            print(f"use : {model_name}")
+            
+            # 读取模型参数
+            for i in os.listdir("./pth/best"):
+                if model_name in i:
+                    model_state_path = os.path.join("./pth/best", i)
+                    break
+                
+            if not os.path.exists(model_state_path):
+                raise FileNotFoundError(f"not found model state file: {model_state_path}")
+            state_dict = torch.load(model_state_path, map_location=self.device)
+            model.load_state_dict(state_dict)
+            
+            # 将模型移动到GPU并设置为评估模式
+            model.to(self.device)
+            model.eval()
+            return model
+        
+        except Exception as e:
+            raise Exception(f"load model failed: {e}") 
+    
+    
     def inference(self, image_path):
         try:
             start_time = time.time()
@@ -68,10 +99,11 @@ class InferenceEngine:
             }
             return {
                 "success": True,
-                "food_name": food_name,
-                "confidence": confidence_value,
-                "nutrition_info": nutrition_info,
-                "inference_time": time.time() - start_time
+                "class_idx": class_idx, # int, 食物类别索引
+                "food_name": food_name, # str, 食物名称
+                "confidence": confidence_value, # float, 置信度
+                "nutrition_info": nutrition_info, # dict, 食物营养信息
+                "inference_time": time.time() - start_time # float, 推理时间
             }
         except Exception as e:
             return {
