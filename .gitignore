@@ -5,6 +5,8 @@
 *.pth
 *.pyc
 *.csv
+*.ipynb
+*/__pycache__/
 
 src/log/
 src/best_model.pth

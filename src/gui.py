@@ -1,4 +1,4 @@
-import os, json, time
+import os, json, time, random
 import torch
 import csv
 from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, 
@@ -195,8 +195,13 @@ class FoodRecognitionSystem(QMainWindow):
         dir_path = QFileDialog.getExistingDirectory(self, '选择文件夹')
         if dir_path:
             self.current_dir_path = dir_path
+            # 显示文件夹中的第一张图片
+            first_image = [f for f in os.listdir(dir_path) if f.lower().endswith(('.jpg', '.jpeg', '.png'))][0]
+            self.show_image(os.path.join(dir_path, first_image)) 
+            # 更新状态栏
             self.statusBar.showMessage(f'已选择文件夹: {dir_path}')
-            self.type = "dir" # 设置识别类型为文件夹批量识别
+            # 设置识别类型为文件夹批量识别
+            self.type = "dir" 
     
     def recognize_dir(self):
         """批量识别文件夹中的图片"""
